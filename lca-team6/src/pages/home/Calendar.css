@@ -1,23 +1,14 @@
-/* 전체 캘린더 확대 */
 .rdp {
   margin: 0 auto;
-  transform: scale(2.0); /* 원하는 배율로 조정 (예: 1.5는 150%) */
+  transform: scale(2.0);
   transform-origin: top center;
-  font-size: 1.1rem; /* 텍스트 크기도 키움 */
+  font-size: 1.1rem;
 }
 
-/* 날짜 셀 크기 키우기 */
 .rdp-day {
   width: 10rem;
   height: 10rem;
   padding: 0.5rem;
-}
-
-/* 선택된 날짜, 오늘 날짜 등 강조 스타일 */
-.rdp-day_selected {
-  background-color: #4caf50;
-  color: white;
-  border-radius: 50%;
 }
 
 .rdp-day_today {
@@ -25,7 +16,6 @@
   border: 1px solid #2196f3;
 }
 
-/* 커스텀 modifier: 일기 있는 날짜 표시 */
 .has-diary {
   background-color: #ffeb3b;
   border-radius: 50%;
