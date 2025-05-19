@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Calendar from './Calendar'
+import './Home.css'
 
 const diaryDates = [
   new Date(2025, 4, 10),
@@ -16,7 +17,7 @@ const Home = () => {
   };
 
   return (
-    <div>
+    <div className='home-wapper'>
       <Calendar
         selectedDate={selectedDate}
         onDateSelect={setSelectedDate}
