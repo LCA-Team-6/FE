@@ -1,0 +1,68 @@
+.write-container{
+    
+    width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    
+    background-color: #FFF9F0;
+}
+
+header h2 {
+    margin-bottom: 70px;
+    text-align: left;
+    color: #4B3E36
+}
+
+.form-group{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 95%;
+    width: 95%;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+label {
+    font-weight: 600;
+    text-align: left;
+    color: #4B3E36;
+}
+
+input {
+    padding: 10px;
+    border: 2px solid #4B3E36;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+textarea{
+    padding: 10px;
+    border: 2px solid #4B3E36;
+    border-radius: 4px;
+    height: 200px;
+    font-size: 16px;
+}
+
+.group-line-up{
+    padding-right: 30px;
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.feedback-checkbox{
+    display: flex;
+    flex-direction: row;
+    white-space: nowrap;
+    align-items: center;
+}
+
+.save-button {
+    padding: 10px 20px;
+    background-color: #b7b7a4;
+}
