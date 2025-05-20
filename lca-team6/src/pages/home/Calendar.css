@@ -1,0 +1,78 @@
+/* Variables declaration */
+.rdp-root {
+  --rdp-accent-color: var(--color-brown);
+  --rdp-day_button-width: 42px;
+  --rdp-day_button-height: 42px;
+  --rdp-nav-height: 3.5rem;
+  --rdp-selected-border: none;
+}
+
+/* 일 칸 */
+.rdp-day {
+  width: 10rem;
+  height: 10rem;
+  padding: 0.5rem;
+  position: relative;
+}
+
+/* 날짜 버튼 */
+.rdp-day_button {
+  position: absolute !important;
+  top: 0.5rem !important;
+  left: 0.5rem !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  border: none !important;
+}
+
+/* 월 이동 화살표 */
+.rdp-chevron{
+  fill: var(--color-dark-green);
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+/* 월 표시 */
+.rdp-caption_label {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--color-dark-green);
+  margin-bottom: 1rem;
+}
+
+/* 선택 된 날짜 */
+.rdp-selected {
+  color: var(--color-brown);
+  font-weight: bold;
+}
+
+/* 선택 된 날짜 버튼 */
+.rdp-selected .rdp-day_button {
+  font-size: 1.3em;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 마우스 커서 올렸을 때 */
+.rdp-day_button:hover {
+  background-color: rgba(216, 158, 116, 0.1) !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 50px !important;
+  transition: all 0.2s ease;
+}
+
+/* 일기 있는 날짜 */
+.has-diary {
+  background-color: rgba(216, 158, 116, 0.1);
+}
+
+/* 오늘 날짜 */
+.today {
+  color: #9AA580;
+  font-weight: 900;
+}
