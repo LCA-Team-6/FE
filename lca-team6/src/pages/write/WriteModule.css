@@ -1,0 +1,115 @@
+.write-container{
+    
+    width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    
+    background-color: #FFF9F0;
+}
+
+header h2 {
+    margin-bottom: 70px;
+    text-align: left;
+    color: #4B3E36
+}
+
+.form-group{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 95%;
+    width: 95%;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+label {
+    font-weight: 600;
+    text-align: left;
+    color: #4B3E36;
+}
+
+input {
+    padding: 10px;
+    border: 2px solid #4B3E36;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+textarea{
+    padding: 10px;
+    border: 2px solid #4B3E36;
+    border-radius: 4px;
+    height: 200px;
+    font-size: 16px;
+}
+
+.group-line-up{
+    padding-right: 30px;
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.feedback-checkbox{
+    display: flex;
+    flex-direction: row;
+    white-space: nowrap;
+    align-items: center;
+}
+
+.save-button {
+    padding: 10px 20px;
+    background-color: #CCD5AE;
+}
+.feedback-save-button {
+    width: 197px;
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 20px;
+    background-color: #CCD5AE;
+}
+
+
+/* 프리셋 선택 스타일 */
+/* 가로 배치 추가 */
+.presets {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.presets h4 {
+  margin: 0;
+  min-width: 60px; /* 카테고리 제목 너비 고정 */
+  margin-right: 15px; /* 제목과 태그 사이 간격 */
+}
+
+.presets-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px; /* 태그 간 간격 */
+}
+
+.presets-button {
+  padding: 6px 12px;
+  border-radius: 20px;
+  background-color: #E9EDC9;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.presets-button:hover {
+  background-color: #e0e0e0;
+}
+
+.presets-button.selected {
+  background-color: #ebaa87;
+  color: white;
+  border-color: #0056b3;
+}
