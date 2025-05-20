@@ -4,6 +4,7 @@
   --rdp-day_button-width: 42px;
   --rdp-day_button-height: 42px;
   --rdp-nav-height: 3.5rem;
+  --rdp-selected-border: none;
 }
 
 /* 일 칸 */
@@ -23,6 +24,7 @@
   align-items: center !important;
   width: 2.5rem !important;
   height: 2.5rem !important;
+  border: none !important;
 }
 
 /* 월 이동 화살표 */
