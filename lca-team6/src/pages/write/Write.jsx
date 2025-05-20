@@ -162,9 +162,14 @@ const Write = () => {
                     <textarea className="form-field"
                     id="aifeedback" placeholder="ai피드백 기다리는중" value={aifeedback}
                     onChange={(e) => setAiFeedback(e.target.value)} ></textarea>
+                </div>
 
+                <div className="group-line-up">
+                    <div></div>
                     <button className="feedback-save-button" type="button">피드백 내용 저장하기</button>
                 </div>
+
+
                 
                 
             </div>
