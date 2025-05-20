@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Calendar from './calendar'
 import './Home.css'
 
+// 임시 일기 있는 날짜
 const diaryDates = [
   new Date(2025, 4, 2),
   new Date(2025, 4, 6),
