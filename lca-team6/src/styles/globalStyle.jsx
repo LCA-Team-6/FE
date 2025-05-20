@@ -10,6 +10,7 @@ const fontSizeXs = '0.75rem'; // 12px
 //color 정의
 const colorWhite = '#FFFFFF';
 const colorBrown = '#CB997E';
+const colorDarkBrown = '#4B3E36'
 const colorLightBrown = '#DDBEA9';
 const colorBeige = '#FFE8D6';
 const colorLightGreen = '#B7B7A4'
@@ -33,5 +34,5 @@ export const GlobalStyle = css`
         --color-light-green: ${colorLightGreen};
         --color-green: ${colorGreen};
         --color-dark-green: ${colorDarkGreen};
-    }
+        --color-dark-brown: ${colorDarkBrown};
 `;
