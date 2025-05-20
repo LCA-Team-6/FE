@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
-import Calendar from './Calendar'
+import Calendar from './calendar'
 import './Home.css'
 
 const diaryDates = [
+  new Date(2025, 4, 2),
+  new Date(2025, 4, 6),
   new Date(2025, 4, 10),
   new Date(2025, 4, 12),
+  new Date(2025, 4, 13),
+  new Date(2025, 4, 14),
+  new Date(2025, 4, 15),
+  new Date(2025, 4, 22),
 ];
 
 const Home = () => {
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   const hasDiary = (date) => {
     return diaryDates.some(
@@ -16,11 +22,18 @@ const Home = () => {
     );
   };
 
+  const handleDateSelect = (date) => {
+    if (date) {
+      setSelectedDate(date);
+    }
+  };
+
   return (
     <div className='home-wapper'>
       <Calendar
         selectedDate={selectedDate}
-        onDateSelect={setSelectedDate}
+        onDateSelect={handleDateSelect}
+        diaryDates={diaryDates}
       />
 
       <div >
