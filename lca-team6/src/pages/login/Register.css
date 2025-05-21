@@ -1,0 +1,75 @@
+/* src/pages/register/Register.css */
+
+.register-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding-left: 400px;
+  padding-right: 400px;
+  background-color: rgb(198, 220, 242);
+}
+
+.register-box {
+  display: flex;
+  flex-direction: column;
+  padding: 40px;
+  border-radius: 10px;
+  background-color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  min-width: 400px;
+}
+
+.register-box h2 {
+  color: rgb(102, 145, 231);
+  font-size: 24px;
+}
+
+.register-input {
+  margin-bottom: 16px;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  flex: 1;
+}
+
+.register-button {
+  padding: 12px;
+  background-color: #4a90e2;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.register-button:hover {
+  background-color: #357ae8;
+}
+
+.back-button {
+  margin-top: 10px;
+  background-color: #ddd;
+  color: #333;
+  border: none;
+  border-radius: 5px;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.back-button:hover {
+  background-color: #ccc;
+}
+
+.error-message {
+  color: red;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.input-row {
+  display: flex;
+  gap: 8px;
+}
