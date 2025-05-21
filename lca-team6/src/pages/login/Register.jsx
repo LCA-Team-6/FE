@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Register.css";
-import customAxios from "../../api/customAxios";
+import axios from "axios";
 
 function Register() {
   const navigate = useNavigate();
@@ -57,7 +57,7 @@ function Register() {
     }
 
     try {
-      const response = await customAxios.post("/auth/email", { email });
+      const response = await axios.post("http://localhost:8080/api/auth/email", { email });
       if (response.status === 200) {
         alert("사용 가능한 이메일입니다.");
         setEmailChecked(true);
@@ -77,7 +77,7 @@ function Register() {
     if (!validate()) return;
 
     try {
-      const { data } = await customAxios.post("/auth/signup", {
+      const { data } = await axios.post("http://localhost:8080/api/auth/signup", {
         email,
         password,
         name
