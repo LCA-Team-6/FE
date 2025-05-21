@@ -12,6 +12,7 @@ const AppRoutes = [
     <Route path='/' element={<Home />} />
     <Route path='/example' element={<Example />} />
     <Route path='/write' element={<Write />} />
+    <Route path='/prompts' element={<Prompts />} />
   </Route>,
   // 네비게이션 버튼 안보이는 페이지
   <Route path='/login' element={<Login />} key="login" />,
