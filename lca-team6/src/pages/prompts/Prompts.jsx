@@ -116,7 +116,7 @@ function Prompts() {
         </div>
       ) : (
         <div className="default-prompt-preview">
-          <h2>개인 설정 미리보기</h2>
+          <h2>미리보기</h2>
           {renderViewGroup("톤/말투", toneOptions, null)}
           {renderViewGroup("성격", personalityOptions, null)}
           {renderViewGroup("길이", lengthOptions, null)}
