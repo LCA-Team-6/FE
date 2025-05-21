@@ -1,6 +1,6 @@
 // src/pages/prompts/Prompts.jsx
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./Prompts.css";
 
 const toneOptions = [
@@ -27,25 +27,68 @@ function Prompts() {
     length: "",
     content: "",
   });
+  const [isModified, setIsModified] = useState(false);
 
   const isEditing = selectedIndex === -1;
   const selectedPreset = selectedIndex != null && selectedIndex >= 0 ? presets[selectedIndex] : null;
+
+  useEffect(() => {
+    if (selectedIndex != null && selectedIndex >= 0) {
+      setNewPreset(presets[selectedIndex]);
+      setIsModified(false);
+    }
+  }, [selectedIndex]);
 
   const handleSelect = (index) => setSelectedIndex(index);
 
   const handleNew = () => {
     setNewPreset({ name: "", tone: "", personality: "", length: "", content: "" });
     setSelectedIndex(-1);
+    setIsModified(false);
   };
 
   const handleChange = (field, value) => {
-    setNewPreset((prev) => ({ ...prev, [field]: value }));
+    const updated = { ...newPreset, [field]: value };
+    setNewPreset(updated);
+
+    if (selectedPreset) {
+      const changed =
+        updated.name !== selectedPreset.name ||
+        updated.tone !== selectedPreset.tone ||
+        updated.personality !== selectedPreset.personality ||
+        updated.length !== selectedPreset.length ||
+        updated.content !== selectedPreset.content;
+      setIsModified(changed);
+    }
   };
 
   const handleSave = () => {
     if (!newPreset.name || !newPreset.tone || !newPreset.personality || !newPreset.length || !newPreset.content) return;
     setPresets([...presets, newPreset]);
     setSelectedIndex(presets.length);
+    setIsModified(false);
+  };
+
+  const handleUpdate = () => {
+    const updatedPresets = [...presets];
+    updatedPresets[selectedIndex] = newPreset;
+    setPresets(updatedPresets);
+    setIsModified(false);
+  };
+
+  const handleDelete = () => {
+    const updatedPresets = [...presets];
+    updatedPresets.splice(selectedIndex, 1);
+    setPresets(updatedPresets);
+    setSelectedIndex(null);
+    setNewPreset({
+      name: "",
+      tone: "",
+      personality: "",
+      length: "",
+      content: "",
+    });
+    setIsModified(false);
   };
 
   const renderOptionGroup = (label, field, options, selected) => (
@@ -108,11 +151,29 @@ function Prompts() {
         </div>
       ) : selectedPreset ? (
         <div className="editor">
-          <h2>{selectedPreset.name}</h2>
-          {renderViewGroup("톤/말투", toneOptions, selectedPreset.tone)}
-          {renderViewGroup("성격", personalityOptions, selectedPreset.personality)}
-          {renderViewGroup("길이", lengthOptions, selectedPreset.length)}
-          {renderViewGroup("컨텐츠", contentOptions, selectedPreset.content)}
+          <input
+            type="text"
+            placeholder="설정 이름을 입력하세요"
+            value={newPreset.name}
+            onChange={(e) => handleChange("name", e.target.value)}
+          />
+          {renderOptionGroup("톤/말투", "tone", toneOptions, newPreset.tone)}
+          {renderOptionGroup("성격", "personality", personalityOptions, newPreset.personality)}
+          {renderOptionGroup("길이", "length", lengthOptions, newPreset.length)}
+          {renderOptionGroup("컨텐츠", "content", contentOptions, newPreset.content)}
+          <div style={{ marginTop: "20px" }}>
+            <button
+              className="save-btn"
+              onClick={handleUpdate}
+              style={{ marginRight: "10px" }}
+              disabled={!isModified}
+            >
+              저장하기
+            </button>
+            <button className="save-btn" onClick={handleDelete} style={{ backgroundColor: "#e94e4e" }}>
+              삭제하기
+            </button>
+          </div>
         </div>
       ) : (
         <div className="default-prompt-preview">
