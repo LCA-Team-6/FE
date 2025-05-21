@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import customAxios from "../../api/customAxios.js"
 import "./WriteModule.css";
 
@@ -8,6 +8,7 @@ const Write = () => {
     const [aifeedback, setAiFeedback] = useState("");
     const [showFeedback, setShowFeedback] = useState(false);
     const [selectPreset, setSelectPreset] = useState("선택해주세요");
+    const [userPreset, setUserPreset] = useState({});
     const [hasFeedbackResponse, setHasFeedbackResponse] = useState(false);
     const [selectOption, setSelectOption] = useState({
         말투: "",
@@ -15,21 +16,42 @@ const Write = () => {
         스타일: "",
         콘텐츠: ""
     });
-    const userPreset = {
-        "친구1": {
-            말투: ["정중한말투"],
-            성격: ["따듯한 상남자형"],
-            스타일: ["짧고굵게"],
-            콘텐츠: ["명언"]
+
+    useEffect(() => {
+        if (showFeedback) {
+            (async () => {
+                try {
+                    const response = await customAxios.get('/prompts');
+                    setUserPreset({
+                        ...response.data,
+                        "직접 추가": {
+                            말투: ["123", "223", "333"],
+                            성격: ["133", "233"],
+                            스타일: ["133", "233"],
+                            콘텐츠: ["133", "233"]
+                        }
+                    });
+                } catch (error) {
+                    console.error("프리셋 불러오기 실패", error);
+                }
+            });
         }
-        ,
-        "친구2": {
-            말투: ["유쾌한말투"],
-            성격: ["긍정적인 응원자형"],
-            스타일: ["상세피드백"],
-            콘텐츠: ["영화"]
+    }, [showFeedback]);
+
+    useEffect(() => {
+        if (selectPreset && selectPreset !== "직접 추가" && userPreset[selectPreset]) {
+            setSelectOption(userPreset[selectPreset]);
+        } else if (selectPreset === "직접 추가") {
+            setSelectOption({
+                말투: "",
+                성격: "",
+                스타일: "",
+                콘텐츠: ""
+            });
         }
-        ,
+    },[selectPreset]);
+
+    const userSetting = {
         "직접 추가": {
             말투: ["123", "223", "333"],
             성격: ["133", "233"],
@@ -69,7 +91,7 @@ const Write = () => {
     // 저장하기 버튼 기능 ( 체크박스 체크 여부에 따른 기능 분리 )
     const handleSave = async () => {
         try {
-
+           
             // 체크 안했을때, 저장버튼
             const response = await customAxios.post('/memos', {
                 title: title,
@@ -141,6 +163,7 @@ const Write = () => {
             {/* 프리셋 선택 메뉴 */}
             {showFeedback && (
                 <div className="preset-section">
+                    <label>프리셋 선택하기  </label>
                     <select
                         className="preset-select"
                         value={selectPreset}
@@ -151,9 +174,9 @@ const Write = () => {
                         <option>
                             선택해
                         </option>
-                        {Object.keys(userPreset).map((preset) => (
-                            <option key={preset} value={preset}>
-                                {preset}
+                        {Object.keys(userPreset).map((presetName) => (
+                            <option key={presetName} value={presetName}>
+                                {presetName}
                             </option>
                         ))}
                     </select>
@@ -168,7 +191,8 @@ const Write = () => {
                                         {options.map((option) => (
                                             <button
                                                 key={option}
-                                                className={`presets-button ${selectOption.includes(option) ? "selected" : ""}`}
+                                                className={`presets-button ${selectOption[type] === option ? "selected" : ""}`}
+                                                onClick={() => handleOptionClick(option, type)}
                                             >
                                                 {option}
                                             </button>
