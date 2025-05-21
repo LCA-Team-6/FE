@@ -5,6 +5,7 @@ import Login from "../pages/login/Login";
 import Register from "../pages/login/Register";
 import Write from "../pages/write/Write";
 import Prompts from "../pages/prompts/Prompts";
+import NavBarShow from "../nav/NavBarShow";
 
 const AppRoutes = [
   // 네비게이션 버튼 보이는 페이지
