@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Calendar from './calendar'
 import './Home.css'
 import axios from 'axios';
+import customAxios from '../../api/customAxios';
 
 const Home = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -13,7 +14,7 @@ const Home = () => {
     const fetchMemoDates = async () => {
       try {
         const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
-        const { data } = await axios.get(`/api/memos/${month}`);
+        const { data } = await customAxios.get(`/memos/${month}`);
         const dates = data.map(memo => new Date(memo.createdAt));
         setMemoDates(dates);
       } catch (error) {
@@ -31,7 +32,7 @@ const Home = () => {
       
       try {
         const date = selectedDate.toISOString() // YYYY-MM-DD 형식
-        const { data } = await axios.get(`/api/memos/${date}`);
+        const { data } = await customAxios.get(`/memos/${date}`);
         setSelectedMemo(data);
       } catch (error) {
         console.error('메모 내용을 불러오는데 실패했습니다:', error);
