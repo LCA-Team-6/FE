@@ -7,7 +7,7 @@ const Write = () => {
     const [memo, setMemo] = useState("");
     const [aifeedback, setAiFeedback] = useState("");
     const [showFeedback, setShowFeedback] = useState(false);
-    const [selectPreset, setSelectPreset] = useState("선택해주세요");
+    const [selectPreset, setSelectPreset] = useState("");
     const [userPreset, setUserPreset] = useState({});
     const [hasFeedbackResponse, setHasFeedbackResponse] = useState(false);
     const [selectOption, setSelectOption] = useState({
@@ -25,16 +25,24 @@ const Write = () => {
                     setUserPreset({
                         ...response.data,
                         "직접 추가": {
-                            말투: ["123", "223", "333"],
-                            성격: ["133", "233"],
-                            스타일: ["133", "233"],
-                            콘텐츠: ["133", "233"]
+                            말투: ["정중한(존댓말)", "친구같은(반말)", "감성적인", "건조한", "유쾌한", "차분한", "따뜻한", "논리적인", "직설적인"],
+                            성격: ["따뜻한 상담자형", "냉철한 분석가형", "친구같은 말동무형", "꼼꼼한 멘토형", "긍정적인 응원자형", "현실적인 조언자형", "공감 중심 대화자형", "조용한 경청자형", "활발한 리액션형"],
+                            스타일: ["짧고 굵게", "감성적 서술", "상세 피드백", "분석 + 제안", "체크리스트 제공", "스토리텔링 기반"],
+                            콘텐츠: ["책", "음악", "영화", "드라마", "명언", "유튜브 영상", "웹툰", "다큐멘터리", "짧은 글귀", "뉴스 기사", "인터뷰", "강의 콘텐츠"]
                         }
                     });
                 } catch (error) {
                     console.error("프리셋 불러오기 실패", error);
+                    setUserPreset({
+                        "직접 추가": {
+                            말투: ["정중한(존댓말)", "친구같은(반말)", "감성적인", "건조한", "유쾌한", "차분한", "따뜻한", "논리적인", "직설적인"],
+                            성격: ["따뜻한 상담자형", "냉철한 분석가형", "친구같은 말동무형", "꼼꼼한 멘토형", "긍정적인 응원자형", "현실적인 조언자형", "공감 중심 대화자형", "조용한 경청자형", "활발한 리액션형"],
+                            스타일: ["짧고 굵게", "감성적 서술", "상세 피드백", "분석 + 제안", "체크리스트 제공", "스토리텔링 기반"],
+                            콘텐츠: ["책", "음악", "영화", "드라마", "명언", "유튜브 영상", "웹툰", "다큐멘터리", "짧은 글귀", "뉴스 기사", "인터뷰", "강의 콘텐츠"]
+                        }
+                    });
                 }
-            });
+            })();
         }
     }, [showFeedback]);
 
@@ -49,23 +57,14 @@ const Write = () => {
                 콘텐츠: ""
             });
         }
-    },[selectPreset]);
-
-    const userSetting = {
-        "직접 추가": {
-            말투: ["123", "223", "333"],
-            성격: ["133", "233"],
-            스타일: ["133", "233"],
-            콘텐츠: ["133", "233"]
-        }
-    }
+    }, [selectPreset]);
 
     // 피드백받기 체크박스 설정
     const handleFeedbackChecked = (e) => {
         setShowFeedback(e.target.checked);
 
         if (!e.target.checked) {
-            setSelectPreset("선택해");
+            setSelectPreset("선택해주세요");
             setSelectOption([]);
         }
 
@@ -91,20 +90,18 @@ const Write = () => {
     // 저장하기 버튼 기능 ( 체크박스 체크 여부에 따른 기능 분리 )
     const handleSave = async () => {
         try {
-           
-            // 체크 안했을때, 저장버튼
-            const response = await customAxios.post('/memos', {
-                title: title,
-                memo: memo,
-                ...(showFeedback && {
-                    preset: selectOption
-                })
-            });
+            const payload = {
+                title,
+                memo
+            };
 
-            alert("저장되었습니다!");
-            // 초기화
-            setTitle("");
-            setMemo("");
+            // 직접 선택 또는 프리셋 모두 selectOption에 반영
+            if (showFeedback) {
+                payload.preset = selectOption;
+            }
+
+            // 체크 안했을때, 저장버튼
+            const saveResponse = await customAxios.post('/memos', payload);
 
             // 피드백 받기 체크하고 저장버튼 -> ai 피드백 요청 추가
             if (showFeedback) {
@@ -119,6 +116,11 @@ const Write = () => {
             } else {
                 setHasFeedbackResponse(false);
             }
+
+            alert("저장되었습니다!");
+            // 초기화
+            setTitle("");
+            setMemo("");
 
         } catch (error) {
             console.error("저장 실패", error);
@@ -169,10 +171,10 @@ const Write = () => {
                         value={selectPreset}
                         onChange={(e) => {
                             setSelectPreset(e.target.value);
-                            setSelectOption([]);
+                            setSelectOption([]); //선택 변경시 초기화 시켜주기
                         }}>
-                        <option>
-                            선택해
+                        <option value="">
+                            선택해주세요
                         </option>
                         {Object.keys(userPreset).map((presetName) => (
                             <option key={presetName} value={presetName}>
