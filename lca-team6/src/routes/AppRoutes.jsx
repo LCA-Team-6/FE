@@ -4,6 +4,7 @@ import Home from "../pages/home/Home";
 import Login from "../pages/login/Login";
 import Register from "../pages/login/Register";
 import Write from "../pages/write/Write";
+import Prompts from "../pages/prompts/Prompts";
 
 export default function AppRoutes() {
   return [
@@ -12,6 +13,7 @@ export default function AppRoutes() {
     <Route key='login' path='/login' element={<Login />} />,
     <Route key='register' path='/register' element={<Register />} />,
     <Route key='write' path='/write' element={<Write />} />,
+    <Route key='promtps' path='/prompts' element={<Prompts />} />,
 
   ];
 }
