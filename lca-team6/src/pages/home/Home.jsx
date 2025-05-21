@@ -1,52 +1,74 @@
 import React, { useState, useEffect } from 'react';
-import Calendar from './calendar'
-import './Home.css'
-import customAxios from '../../api/customAxios';
+import Calendar from './calendar';
+import MemoList from './MemoList';
+import './Home.css';
+// import customAxios from '../../api/customAxios';
 
 const Home = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [memoDates, setMemoDates] = useState([]);
-  const [selectedMemo, setSelectedMemo] = useState(null);
+  const [selectedMemo, setSelectedMemo] = useState([]);
 
-  // 월별 메모 날짜 목록 가져오기
-  useEffect(() => {
-    const fetchMemoDates = async () => {
-      try {
-        const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
-        const { data } = await customAxios.get(`/memos/${month}`);
-        const dates = data.map(memo => new Date(memo.createdAt));
-        setMemoDates(dates);
-      } catch (error) {
-        console.error('메모 날짜를 불러오는데 실패했습니다:', error);
-      }
-    };
+  // 더미 데이터
+  const dummyMemoMap = {
+    '2025-05-20': [
+      {
+        memoId: 1,
+        memo: '사용자 작성 글 1',
+        analysis: 'ai 분석 답변 1',
+      },
+      {
+        memoId: 2,
+        memo: '사용자 작성 글 2',
+        analysis: null,
+      },
+    ],
+    '2025-05-21': [
+      {
+        memoId: 3,
+        memo: '사용자 작성 글 3',
+        analysis: 'ai 분석 답변 3',
+      },
+    ],
+  };
 
-    fetchMemoDates();
-  }, [selectedDate]);
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
-  // 선택된 날짜의 메모 내용 가져오기
+  // 선택한 날짜의 메모 불러오기
   useEffect(() => {
     const fetchSelectedMemo = async () => {
       if (!selectedDate) return;
-      
-      try {
-        const date = selectedDate.toISOString() // YYYY-MM-DD 형식
-        const { data } = await customAxios.get(`/memos/${date}`);
-        setSelectedMemo(data);
-      } catch (error) {
-        console.error('메모 내용을 불러오는데 실패했습니다:', error);
-        setSelectedMemo(null);
+
+      const dateKey = formatDate(selectedDate);
+
+      // 실제 API 요청
+      // const { data } = await customAxios.get(`/memos/${dateKey}`);
+      // setSelectedMemo(data);
+
+      // 더미 데이터
+      if (dummyMemoMap[dateKey]) {
+        setSelectedMemo(dummyMemoMap[dateKey]);
+      } else {
+        setSelectedMemo([]);
       }
     };
 
     fetchSelectedMemo();
   }, [selectedDate]);
 
-  const hasMemo = (date) => {
-    return memoDates.some(
-      (d) => d.toDateString() === date.toDateString()
-    );
-  };
+  // 메모가 존재하는 날 표시
+  useEffect(() => {
+    const memoDates = Object.keys(dummyMemoMap).map((dateStr) => {
+      const [year, month, day] = dateStr.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    });
+    setMemoDates(memoDates);
+  }, []);
 
   const handleDateSelect = (date) => {
     if (date) {
@@ -55,34 +77,16 @@ const Home = () => {
   };
 
   return (
-    <div className='home-wapper'>
-      <Calendar
-        selectedDate={selectedDate}
-        onDateSelect={handleDateSelect}
-        diaryDates={memoDates}
-      />
-
-      <div>
-        {selectedDate ? (
-          hasMemo(selectedDate) ? (
-            <div>
-              <p><strong>{selectedDate.toDateString()}</strong>의 메모:</p>
-              {selectedMemo ? (
-                <ul>
-                  {selectedMemo.map(memo => (
-                    <li key={memo.memoId}>{memo.content}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p>메모를 불러오는 중...</p>
-              )}
-            </div>
-          ) : (
-            <p><strong>{selectedDate.toDateString()}</strong>: 작성된 메모가 없습니다.</p>
-          )
-        ) : (
-          <p>날짜를 선택해 주세요.</p>
-        )}
+    <div className="home-wrapper">
+      <div className="calendar-container">
+        <Calendar
+          selectedDate={selectedDate}
+          onDateSelect={handleDateSelect}
+          diaryDates={memoDates}
+        />
+      </div>
+      <div className="memo-list-container">
+        <MemoList date={selectedDate} memos={selectedMemo} />
       </div>
     </div>
   );
