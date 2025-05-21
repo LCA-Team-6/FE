@@ -1,4 +1,5 @@
 import {useLocation, useNavigate} from "react-router-dom";
+import "./NavBar.css";
 
 const NavBar = () =>{
     const location = useLocation();
@@ -6,7 +7,9 @@ const NavBar = () =>{
     
     const routes = [
         { name: "글쓰기", path:"/write" },
-        { name: "홈", path:"/" }
+        { name: "홈", path:"/" },
+        { name: "예시", path:"/example" }
+
         // { name: "개인 설정", path:"/" },
         // { name: "마이페이지", path:"/" },
         // { name: "로그아웃", path:"/" },
