@@ -15,5 +15,18 @@ export default function AppRoutes() {
     <Route key='write' path='/write' element={<Write />} />,
     <Route key='promtps' path='/prompts' element={<Prompts />} />,
 
-  ];
-}
+import NavBarShow from "../nav/NavBarShow";
+
+const AppRoutes = [
+  // 네비게이션 버튼 보이는 페이지
+  <Route element={<NavBarShow />} key="layout">
+    <Route path='/' element={<Home />} />
+    <Route path='/example' element={<Example />} />
+    <Route path='/write' element={<Write />} />
+  </Route>,
+  // 네비게이션 버튼 안보이는 페이지
+  <Route path='/login' element={<Login />} key="login" />,
+  <Route path='/register' element={<Register />} key="register" />,
+];
+
+export default AppRoutes;

@@ -64,6 +64,7 @@ const Write = () => {
     };
 
     return (
+        
         <div className="write-container">
             <header>
                 <h2>글쓰기</h2>

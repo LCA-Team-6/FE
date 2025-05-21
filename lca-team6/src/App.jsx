@@ -8,7 +8,7 @@ function App() {
     <BrowserRouter>
       <Global styles={GlobalStyle} />
       <Routes>
-        {AppRoutes()}
+        {AppRoutes}
       </Routes>
     </BrowserRouter>
   );
