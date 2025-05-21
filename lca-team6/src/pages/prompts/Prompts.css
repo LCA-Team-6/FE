@@ -1,8 +1,7 @@
-/* Prompts.css */
-
 .prompts-container {
   display: flex;
   height: 100vh;
+  width: 100vw;
   font-family: Arial, sans-serif;
 }
 
