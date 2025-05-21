@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Calendar from './calendar'
 import './Home.css'
-import axios from 'axios';
 import customAxios from '../../api/customAxios';
 
 const Home = () => {
