@@ -17,6 +17,7 @@ const colorBeige = '#FFE8D6';
 const colorLightGreen = '#B7B7A4';
 const colorGreen = '#A5A58D';
 const colorDarkGreen = '#6B705C';
+const colorLightGray = '#F8F9FA';
 
 
 
@@ -37,4 +38,5 @@ export const GlobalStyle = css`
         --color-green: ${colorGreen};
         --color-dark-green: ${colorDarkGreen};
         --color-dark-brown: ${colorDarkBrown};
+        --color-light-gray: ${colorLightGray};
 `;
