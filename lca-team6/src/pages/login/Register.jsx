@@ -2,20 +2,19 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Register.css";
+import axios from "axios";
 
 function Register() {
   const navigate = useNavigate();
-  const [nickname, setNickname] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [emailChecked, setEmailChecked] = useState(false);
 
-  const dummyEmails = ["test@example.com", "user@example.com"];
-
   const validate = () => {
-    if (nickname.trim().length < 2) {
+    if (name.trim().length < 2) {
       setError("닉네임은 2자 이상이어야 해요.");
       return false;
     }
@@ -45,7 +44,7 @@ function Register() {
     return true;
   };
 
-  const handleEmailCheck = () => {
+  const handleEmailCheck = async () => {
     if (!email) {
       setError("이메일을 입력해주세요.");
       return;
@@ -57,21 +56,41 @@ function Register() {
       return;
     }
 
-    if (dummyEmails.includes(email)) {
-      setError("이미 사용 중인 이메일이에요.");
+    try {
+      const response = await axios.post("http://localhost:8080/api/auth/email", { email });
+      if (response.status === 200) {
+        alert("사용 가능한 이메일입니다.");
+        setEmailChecked(true);
+        setError("");
+      } else {
+        setError("이미 사용 중인 이메일이에요.");
+        setEmailChecked(false);
+      }
+    } catch (error) {
+      setError("서버와 연결할 수 없습니다.");
       setEmailChecked(false);
-    } else {
-      alert("사용 가능한 이메일입니다.");
-      setEmailChecked(true);
-      setError("");
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validate()) {
+    if (!validate()) return;
+
+    try {
+      const { data } = await axios.post("http://localhost:8080/api/auth/signup", {
+        email,
+        password,
+        name
+      });
+
       alert("회원가입 성공! 로그인 페이지로 이동합니다.");
       navigate("/login");
+    } catch (error) {
+      if (error.response) {
+        setError("회원가입에 실패했습니다.");
+      } else {
+        setError("서버와 연결할 수 없습니다.");
+      }
     }
   };
 
@@ -84,8 +103,8 @@ function Register() {
           className="register-input"
           type="text"
           placeholder="닉네임"
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
         />
         <div className="input-row">
           <input
