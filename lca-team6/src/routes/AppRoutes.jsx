@@ -4,7 +4,7 @@ import Home from "../pages/home/Home";
 import Login from "../pages/login/Login";
 import Register from "../pages/login/Register";
 import Write from "../pages/write/Write";
-import NavBarShow from "../nav/NavBarShow";
+import Prompts from "../pages/prompts/Prompts";
 
 const AppRoutes = [
   // 네비게이션 버튼 보이는 페이지
@@ -12,6 +12,7 @@ const AppRoutes = [
     <Route path='/' element={<Home />} />
     <Route path='/example' element={<Example />} />
     <Route path='/write' element={<Write />} />
+    <Route path='/prompts' element={<Prompts />} />
   </Route>,
   // 네비게이션 버튼 안보이는 페이지
   <Route path='/login' element={<Login />} key="login" />,
