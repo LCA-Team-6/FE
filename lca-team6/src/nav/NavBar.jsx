@@ -6,10 +6,10 @@ const NavBar = () =>{
     
     const routes = [
         { name: "글쓰기", path:"/write" },
-        { name: "홈", path:"/" },
-        { name: "개인 설정", path:"/" },
-        { name: "마이페이지", path:"/" },
-        { name: "로그아웃", path:"/" },
+        { name: "홈", path:"/" }
+        // { name: "개인 설정", path:"/" },
+        // { name: "마이페이지", path:"/" },
+        // { name: "로그아웃", path:"/" },
     ];
     return(
         <nav className="nav-bar">
