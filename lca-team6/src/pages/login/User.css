@@ -1,5 +1,6 @@
 .user-container {
   display: flex;
+  width: 100vw;
   height: 100vh;
   font-family: Arial, sans-serif;
 }
@@ -43,6 +44,7 @@
 
 .editor {
   flex: 1;
+  width: 100%;
   padding: 30px;
   background-color: #fff;
   overflow-y: auto;
@@ -109,4 +111,16 @@
 
 .save-btn:hover:not(:disabled) {
   background-color: #357ae8;
+}
+
+.warning-box {
+  background-color: #ffecec;
+  border: 1px solid #ff9999;
+  padding: 15px;
+  width: 420px;
+  border-radius: 6px;
+  color: #cc0000;
+  font-size: 14px;
+  margin-bottom: 20px;
+  line-height: 1.5;
 }
