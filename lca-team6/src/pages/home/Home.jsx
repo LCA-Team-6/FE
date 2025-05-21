@@ -46,29 +46,55 @@ const Home = () => {
 
       const dateKey = formatDate(selectedDate);
 
-      // 실제 API 요청
-      // const { data } = await customAxios.get(`/memos/${dateKey}`);
-      // setSelectedMemo(data);
-
-      // 더미 데이터
+      // 더미 데이터 사용
       if (dummyMemoMap[dateKey]) {
         setSelectedMemo(dummyMemoMap[dateKey]);
       } else {
         setSelectedMemo([]);
       }
+
+      // 실제 API 사용
+      /*
+        try {
+          const { data } = await customAxios.get(`/memos/${dateKey}`);
+          setSelectedMemo(data);
+        } catch (error) {
+          console.error('메모 내용을 불러오는데 실패했습니다:', error);
+          setSelectedMemo([]);
+        }
+      */
     };
 
     fetchSelectedMemo();
   }, [selectedDate]);
 
-  // 메모가 존재하는 날 표시
+  // 메모가 존재하는 날짜들 표시
   useEffect(() => {
+    // 더미 데이터 사용
     const memoDates = Object.keys(dummyMemoMap).map((dateStr) => {
       const [year, month, day] = dateStr.split('-').map(Number);
       return new Date(year, month - 1, day);
     });
     setMemoDates(memoDates);
   }, []);
+
+  // 실제 API 사용
+  /*
+    useEffect(() => {
+      const fetchMemoDates = async () => {
+        try {
+          const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
+          const { data } = await customAxios.get(`/memos/${month}`);
+          const dates = data.map(memo => new Date(memo.createdAt));
+          setMemoDates(dates);
+        } catch (error) {
+          console.error('메모 날짜를 불러오는데 실패했습니다:', error);
+        }
+      };
+
+      fetchMemoDates();
+    }, [selectedDate]);
+  */
 
   const handleDateSelect = (date) => {
     if (date) {
