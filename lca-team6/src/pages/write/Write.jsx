@@ -8,6 +8,7 @@ const Write = () => {
     const [aifeedback, setAiFeedback] = useState("");
     const [showFeedback, setShowFeedback] = useState(false);
     const [selectPreset, setSelectPreset] = useState("선택해주세요");
+    const [hasFeedbackResponse, setHasFeedbackResponse] = useState(false);
     const [selectOption, setSelectOption] = useState({
         말투: "",
         성격: "",
@@ -48,6 +49,7 @@ const Write = () => {
 
     }
 
+    // 직접 설정 할 때 한 type(말투/성격/스타일/콘텐츠)에 option 하나씩만 선택 가능하게 하기
     const handleOptionClick = (option, type) => {
         setSelectOption(prev => {
             if (prev[type] === option) {
@@ -64,17 +66,38 @@ const Write = () => {
         });
     };
 
+    // 저장하기 버튼 기능 ( 체크박스 체크 여부에 따른 기능 분리 )
     const handleSave = async () => {
         try {
+
+            // 체크 안했을때, 저장버튼
             const response = await customAxios.post('/memos', {
                 title: title,
-                memo: memo
+                memo: memo,
+                ...(showFeedback && {
+                    preset: selectOption
+                })
             });
 
             alert("저장되었습니다!");
             // 초기화
             setTitle("");
-            setContent("");
+            setMemo("");
+
+            // 피드백 받기 체크하고 저장버튼 -> ai 피드백 요청 추가
+            if (showFeedback) {
+                const aiResponse = await customAxios.post('/analysis', {
+                    title,
+                    memo,
+                    preset: selectOption
+                });
+
+                setAiFeedback(aiResponse.data.analysis); //추후 수정 포인트
+                setHasFeedbackResponse(true);
+            } else {
+                setHasFeedbackResponse(false);
+            }
+
         } catch (error) {
             console.error("저장 실패", error);
             alert("저장에 실패했습니다.");
@@ -82,6 +105,7 @@ const Write = () => {
     };
     return (
 
+        // 페이지 이름 ( 추후 스타일 수정 고려 )
         <div className="write-container">
             <header>
                 <h2>글쓰기</h2>
@@ -134,6 +158,7 @@ const Write = () => {
                         ))}
                     </select>
 
+                    {/* 미리 지정한 개인 설정 프리셋 */}
                     {selectPreset !== "직접 추가" && userPreset[selectPreset] && (
                         <div>
                             {Object.entries(userPreset[selectPreset]).map(([type, options]) => (
@@ -154,6 +179,7 @@ const Write = () => {
                         </div>
                     )}
 
+                    {/* 설정 직접 추가 */}
                     {selectPreset === "직접 추가" && (
                         <div>
                             {Object.entries(userPreset["직접 추가"]).map(([type, options]) => (
@@ -175,20 +201,22 @@ const Write = () => {
                         </div>
                     )}
 
-                    <div className="form-group">
-                        <label>ai피드백 (피드백 받기 체크, 프리셋 설정, 저장하기 누르면 나오게 만들기)</label>
-                        <textarea className="form-field"
-                            id="aifeedback" placeholder="ai피드백 기다리는중" value={aifeedback}
-                            onChange={(e) => setAiFeedback(e.target.value)} ></textarea>
-                    </div>
+                    {/* ai피드백 받는 필드 + 피드백 저장 버튼 */}
+                    {showFeedback && hasFeedbackResponse && (
+                        <div>
+                            <div className="form-group">
+                                <label>ai피드백 (피드백 받기 체크, 프리셋 설정, 저장하기 누르면 나오게 만들기)</label>
+                                <textarea className="form-field"
+                                    id="aifeedback" placeholder="ai피드백 기다리는중" value={aifeedback}
+                                    onChange={(e) => setAiFeedback(e.target.value)} ></textarea>
+                            </div>
 
-                    <div className="group-line-up">
-                        <div></div>
-                        <button className="feedback-save-button" type="button">피드백 내용 저장하기</button>
-                    </div>
-
-
-
+                            <div className="group-line-up">
+                                <div></div>
+                                <button className="feedback-save-button" type="button">피드백 내용 저장하기</button>
+                            </div>
+                        </div>
+                    )}
 
                 </div>
             )}
