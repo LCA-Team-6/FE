@@ -9,13 +9,15 @@ const fontSizeXs = '0.75rem'; // 12px
 
 //color 정의
 const colorWhite = '#FFFFFF';
+
 const colorBrown = '#CB997E';
 const colorDarkBrown = '#4B3E36'
 const colorLightBrown = '#DDBEA9';
 const colorBeige = '#FFE8D6';
-const colorLightGreen = '#B7B7A4'
-const colorGreen = '#A5A58D'
-const colorDarkGreen = '#6B705C'
+const colorLightGreen = '#B7B7A4';
+const colorGreen = '#A5A58D';
+const colorDarkGreen = '#6B705C';
+
 
 
 export const GlobalStyle = css`
