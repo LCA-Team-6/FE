@@ -78,8 +78,7 @@ textarea{
 /* 프리셋 선택 스타일 */
 /* 가로 배치 추가 */
 .presets {
-  display: flex;
-  align-items: center;
+  margin-top: 10px;
   margin-bottom: 10px;
 }
 
@@ -90,9 +89,14 @@ textarea{
 }
 
 .presets-grid {
+  margin-top: 10px;
   display: flex;
   flex-wrap: wrap;
   gap: 8px; /* 태그 간 간격 */
+}
+
+.preset-select {
+  margin-top: 20px;
 }
 
 .presets-button {
