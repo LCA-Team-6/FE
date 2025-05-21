@@ -1,13 +1,14 @@
 import { useState } from "react";
+import customAxios from "../../api/customAxios.js"
 import "./WriteModule.css";
 
 const Write = () => {
     const [title, setTitle] = useState("");
-    const [content, setContent] = useState("");
+    const [memo, setMemo] = useState("");
     const [aifeedback, setAiFeedback] = useState("");
     const [showFeedback, setShowFeedback] = useState(false);
     const [selectPreset, setSelectPreset] = useState("선택해주세요");
-    const [selectTag, setSelectTag] = useState({
+    const [selectOption, setSelectOption] = useState({
         말투: "",
         성격: "",
         스타일: "",
@@ -42,29 +43,45 @@ const Write = () => {
 
         if (!e.target.checked) {
             setSelectPreset("선택해");
-            setSelectTag([]);
+            setSelectOption([]);
         }
 
     }
 
-    const handleTagClick = (tag, category) => {
-        setSelectTag(prev => {
-            if (prev[category] === tag) {
+    const handleOptionClick = (option, type) => {
+        setSelectOption(prev => {
+            if (prev[type] === option) {
                 return {
                     ...prev,
-                    [category]: ""
+                    [type]: ""
                 };
             }
 
             return {
                 ...prev,
-                [category]: tag
+                [type]: option
             };
         });
     };
 
+    const handleSave = async () => {
+        try {
+            const response = await customAxios.post('/memos', {
+                title: title,
+                memo: memo
+            });
+
+            alert("저장되었습니다!");
+            // 초기화
+            setTitle("");
+            setContent("");
+        } catch (error) {
+            console.error("저장 실패", error);
+            alert("저장에 실패했습니다.");
+        }
+    };
     return (
-        
+
         <div className="write-container">
             <header>
                 <h2>글쓰기</h2>
@@ -79,9 +96,9 @@ const Write = () => {
                 </div>
 
                 <div className="form-field">
-                    <label htmlFor="content">일기쓰기</label>
-                    <textarea id="content" placeholder="내용을 입력해주세요" value={content}
-                        onChange={(e) => setContent(e.target.value)} required rows="10"></textarea>
+                    <label htmlFor="memo">일기쓰기</label>
+                    <textarea id="memo" placeholder="내용을 입력해주세요" value={memo}
+                        onChange={(e) => setMemo(e.target.value)} required rows="10"></textarea>
                 </div>
 
             </div>
@@ -90,90 +107,90 @@ const Write = () => {
             <div className="group-line-up">
                 <div className="feedback-checkbox">
                     <input type="checkbox" id="feedbackCheckbox"
-                    checked = {showFeedback}
-                    onChange={handleFeedbackChecked}></input>
+                        checked={showFeedback}
+                        onChange={handleFeedbackChecked}></input>
                     <label htmlFor="feedbackCheckbox">피드백 받기</label>
                 </div>
-                <button className="save-button" type="button">저장하기</button>
+                <button className="save-button" type="button" onClick={handleSave}>저장하기</button>
             </div>
 
             {/* 프리셋 선택 메뉴 */}
             {showFeedback && (
-            <div className="preset-section">
-                <select
-                    className="preset-select"
-                    value={selectPreset}
-                    onChange={(e) => {
-                        setSelectPreset(e.target.value);
-                        setSelectTag([]);
-                    }}>
-                    <option>
-                        선택해
-                    </option>
-                    {Object.keys(userPreset).map((preset) => (
-                        <option key={preset} value={preset}>
-                            {preset}
+                <div className="preset-section">
+                    <select
+                        className="preset-select"
+                        value={selectPreset}
+                        onChange={(e) => {
+                            setSelectPreset(e.target.value);
+                            setSelectOption([]);
+                        }}>
+                        <option>
+                            선택해
                         </option>
-                    ))}
-                </select>
-
-                {selectPreset !== "직접 추가" && userPreset[selectPreset] && (
-                    <div>
-                        {Object.entries(userPreset[selectPreset]).map(([presetKey, tags]) => (
-                            <div key={presetKey} className="presets">
-                                <h4>{presetKey}</h4>
-                                <div className="presets-grid">
-                                    {tags.map((tag) => (
-                                        <button
-                                            key={tag}
-                                            className={`presets-button ${selectTag.includes(tag) ? "selected" : ""}`}
-                                        >
-                                            {tag}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
+                        {Object.keys(userPreset).map((preset) => (
+                            <option key={preset} value={preset}>
+                                {preset}
+                            </option>
                         ))}
-                    </div>
-                )}
+                    </select>
 
-                {selectPreset === "직접 추가" && (
-                    <div>
-                        {Object.entries(userPreset["직접 추가"]).map(([category, tags]) => (
-                            <div key={category} className="presets">
-                                <h4>{category}</h4>
-                                <div className="presets-grid">
-                                    {tags.map((tag) => (
-                                        <button
-                                            key={tag}
-                                            className={`presets-button ${selectTag[category] === tag ? "selected" : ""}`}
-                                            onClick={() => handleTagClick(tag, category)}
-                                        >
-                                            {tag}
-                                        </button>
-                                    ))}
+                    {selectPreset !== "직접 추가" && userPreset[selectPreset] && (
+                        <div>
+                            {Object.entries(userPreset[selectPreset]).map(([type, options]) => (
+                                <div key={type} className="presets">
+                                    <h4>{type}</h4>
+                                    <div className="presets-grid">
+                                        {options.map((option) => (
+                                            <button
+                                                key={option}
+                                                className={`presets-button ${selectOption.includes(option) ? "selected" : ""}`}
+                                            >
+                                                {option}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
+                    )}
+
+                    {selectPreset === "직접 추가" && (
+                        <div>
+                            {Object.entries(userPreset["직접 추가"]).map(([type, options]) => (
+                                <div key={type} className="presets">
+                                    <h4>{type}</h4>
+                                    <div className="presets-grid">
+                                        {options.map((option) => (
+                                            <button
+                                                key={option}
+                                                className={`presets-button ${selectOption[type] === option ? "selected" : ""}`}
+                                                onClick={() => handleOptionClick(option, type)}
+                                            >
+                                                {option}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    <div className="form-group">
+                        <label>ai피드백 (피드백 받기 체크, 프리셋 설정, 저장하기 누르면 나오게 만들기)</label>
+                        <textarea className="form-field"
+                            id="aifeedback" placeholder="ai피드백 기다리는중" value={aifeedback}
+                            onChange={(e) => setAiFeedback(e.target.value)} ></textarea>
                     </div>
-                )}
 
-                <div className="form-group">
-                    <label>ai피드백 (피드백 받기 체크, 프리셋 설정, 저장하기 누르면 나오게 만들기)</label>
-                    <textarea className="form-field"
-                    id="aifeedback" placeholder="ai피드백 기다리는중" value={aifeedback}
-                    onChange={(e) => setAiFeedback(e.target.value)} ></textarea>
+                    <div className="group-line-up">
+                        <div></div>
+                        <button className="feedback-save-button" type="button">피드백 내용 저장하기</button>
+                    </div>
+
+
+
+
                 </div>
-
-                <div className="group-line-up">
-                    <div></div>
-                    <button className="feedback-save-button" type="button">피드백 내용 저장하기</button>
-                </div>
-
-
-                
-                
-            </div>
             )}
         </div>
     );
