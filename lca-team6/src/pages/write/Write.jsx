@@ -14,8 +14,8 @@ const Write = () => {
         tone: [], personality: [], style: [], content: []
     })
     const [hasFeedbackResponse, setHasFeedbackResponse] = useState(false);
-    const [savedMemoId,setSavedMemoId] = useState(null);
-    const [selectedPresetId,setSelectedPresetId] = useState(0);
+    const [savedMemoId, setSavedMemoId] = useState(null);
+    const [selectedPresetId, setSelectedPresetId] = useState(0);
     const [selectOption, setSelectOption] = useState({
         말투: null,
         성격: null,
@@ -45,7 +45,7 @@ const Write = () => {
                 }
             })();
         }
-        
+
     }, [showFeedback]);
 
     useEffect(() => {
@@ -133,48 +133,93 @@ const Write = () => {
     };
 
     // 저장하기 버튼 기능 ( 체크박스 체크 여부에 따른 기능 분리 )
-     const handleSave = async () => {
+    const handleSave = async () => {
     if (!validateForm()) return;
+    
     try {
-      const payload = { title, memo,
-        tone: selectOption.말투?.id,
-        personality: selectOption.성격?.id,
-        style: selectOption.스타일?.id,
-        content: selectOption.콘텐츠?.id
-      };
-      if (showFeedback) {
-        payload.presetPromptId = selectedPresetId || null;
-      }
+        // 일기 저장
+        const payload = { 
+            title, 
+            memo,
+            tone: selectOption.말투?.id,
+            personality: selectOption.성격?.id,
+            style: selectOption.스타일?.id,
+            content: selectOption.콘텐츠?.id
+        };
 
-      const saveRes = await customAxios.post('/memos', payload);
-      setSavedMemoId(saveRes.data.memoId);
+        // 피드백이 체크되어 있으면 AI 분석 요청
+        if (showFeedback) {
+            try {
+                // 피드백 O: analysis 호출 (메모+분석 둘 다 처리)
+                const analysisPayload = {
+                    title, memo,
+                    tone: selectOption.말투?.id,
+                    personality: selectOption.성격?.id,
+                    style: selectOption.스타일?.id,
+                    content: selectOption.콘텐츠?.id
+            };
+                const analysisRes = await customAxios.post('/analysis', analysisPayload);
+                
+                // AI 피드백 결과 저장
+                setSavedMemoId(analysisRes.data.memoId);
+                setAiFeedback(analysisRes.data.analysis || "분석 결과를 가져올 수 없습니다.");
+                setEmotions(analysisRes.data.emotions || []);
+                setHasFeedbackResponse(true);
+                
+            } catch (analysisError) {
+                console.error("AI 분석 에러:", analysisError);
+                
+                // AI 분석 실패해도 메모는 저장된 상태
+                alert("메모는 저장되었지만 AI 분석에 실패했습니다. 나중에 다시 시도해주세요.");
+                
+                setAiFeedback("AI 분석에 일시적인 문제가 발생했습니다.");
+                setEmotions([]);
+                setHasFeedbackResponse(true);
+            }
+        } else {
+            // 피드백 X: 메모만 저장
+            const payload = { title, memo };
+            const saveRes = await customAxios.post('/memos', payload);
+            setSavedMemoId(saveRes.data.memoId);
+            setHasFeedbackResponse(false);
+        }
 
-      if (showFeedback) {
-        const analysisRes = await customAxios.post('/analysis', payload);
-        setAiFeedback(analysisRes.data.analysis);
-        setEmotions(analysisRes.data.emotions || []);
-        setHasFeedbackResponse(true);
-      } else {
-        setHasFeedbackResponse(false);
-      }
-
-      alert("저장되었습니다!");
-      setTitle(""); setMemo("");
+        alert("저장되었습니다!");
+        
+        // 폼 초기화 (제목, 메모만)
+        setTitle(""); 
+        setMemo("");
+        
     } catch (err) {
-      console.error(err);
-      alert("저장에 실패했습니다.");
+        console.error("저장 에러:", err);
+        
+        // 에러 응답 상세 정보
+        if (err.response) {
+            console.error("에러 응답:", err.response);
+            alert(`저장에 실패했습니다. (${err.response.status}: ${err.response.data?.message || "알 수 없는 오류"})`);
+        } else {
+            // 피드백 없이 메모만 저장
+            const payload = { title, memo };
+            const saveRes = await customAxios.post('/memos', payload);
+            setSavedMemoId(saveRes.data.memoId);
+            alert("저장에 실패했습니다. 네트워크를 확인해주세요.");
+        }
     }
-  };
+};
 
     const handleAiFeedbackSave = async () => {
-        const aiMemoResponse = await customAxios.post('/analysis/save', {
-            
-            memoId: savedMemoId,
-            presetPromptId: selectedPresetId,
-            analysis: aiFeedback,
-            emotions: emotions 
-        });
-        alert("피드백이 저장되었습니다.");
+        try {
+            await customAxios.post('/analysis/save', {
+                memoId: savedMemoId,
+                presetPromptId: selectedPresetId === "직접 추가" ? null : selectedPresetId,
+                analysis: aiFeedback,
+                emotions: emotions
+            });
+            alert("피드백이 저장되었습니다.");
+        } catch (err) {
+            console.error(err);
+            alert("피드백 저장에 실패했습니다.");
+        }
     };
 
     return (
@@ -235,7 +280,7 @@ const Write = () => {
                     </select>
 
                     {/* 미리 지정한 개인 설정 프리셋 */}
-                     
+
                     {selectedPresetId !== "직접 추가" && selectedPresetId !== 0 && selectedPresetId && (
                         <div>
                             <h4>선택된 프리셋: {presets.find(p => p.presetPromptId == selectedPresetId)?.name}</h4>
@@ -249,7 +294,7 @@ const Write = () => {
                         </div>
                     )}
 
-                    
+
 
                     {/* 설정 직접 추가 */}
                     {selectedPresetId === "직접 추가" && (
@@ -277,18 +322,45 @@ const Write = () => {
                     {showFeedback && hasFeedbackResponse && (
                         <div>
                             <div className="form-group">
-                                <label>ai피드백 (피드백 받기 체크, 프리셋 설정, 저장하기 누르면 나오게 만들기)</label>
-                                <textarea className="form-field"
-                                    id="aiFeedback" placeholder="ai피드백 기다리는중" value={aiFeedback}
-                                    onChange={(e) => setAiFeedback(e.target.value)} ></textarea>
+                                <label>AI 피드백</label>
+                                <textarea
+                                    className="form-field"
+                                    id="aiFeedback"
+                                    placeholder="AI 피드백을 불러오는 중..."
+                                    value={aiFeedback}
+                                    onChange={(e) => setAiFeedback(e.target.value)}
+                                    rows="8"
+                                />
                             </div>
+
+                            {/* 감정 분석 결과도 보여주기 (선택사항) */}
+                            {emotions.length > 0 && (
+                                <div className="emotions-display">
+                                    <h5>감정 분석 결과:</h5>
+                                    <div className="emotions-grid">
+                                        {emotions.map((emotion) => (
+                                            <div key={emotion.code} className="emotion-item">
+                                                <span>{emotion.name}</span>
+                                                <span className="score">{emotion.score}/10</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="group-line-up">
                                 <div></div>
-                                <button className="feedback-save-button" type="button" onClick={handleAiFeedbackSave}>피드백 내용 저장하기</button>
+                                <button
+                                    className="feedback-save-button"
+                                    type="button"
+                                    onClick={handleAiFeedbackSave}
+                                    disabled={!aiFeedback.trim()}
+                                >
+                                    피드백 내용 저장하기
+                                </button>
                             </div>
                         </div>
-                    )} 
+                    )}
 
                 </div>
             )}
