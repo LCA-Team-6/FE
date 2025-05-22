@@ -1,22 +1,6 @@
-// src/pages/prompts/Prompts.jsx
-
 import { useEffect, useState } from "react";
 import customAxios from "../../api/customAxios";
 import "./Prompts.css";
-
-const toneOptions = [
-  "정중한(존댓말)", "친구같은(반말)", "감성적인", "건조한", "유쾌한", "차분한", "따뜻한", "논리적인", "직설적인"
-];
-const personalityOptions = [
-  "따뜻한 상담자형", "냉철한 분석가형", "친구같은 말동무형", "꼼꼼한 멘토형", "긍정적인 응원자형",
-  "현실적인 조언자형", "공감 중심 대화자형", "조용한 경청자형", "활발한 리액션형"
-];
-const lengthOptions = [
-  "짧고 굵게", "감성적 서술", "상세 피드백", "분석 + 제안", "체크리스트 제공", "스토리텔링 기반"
-];
-const contentOptions = [
-  "책", "음악", "영화", "드라마", "명언", "유튜브 영상", "웹툰", "다큐멘터리", "짧은 글귀", "뉴스 기사", "인터뷰", "강의 콘텐츠"
-];
 
 function Prompts() {
   const [presets, setPresets] = useState([]);
@@ -30,10 +14,16 @@ function Prompts() {
   });
   const [isModified, setIsModified] = useState(false);
 
+  const [toneOptions, setToneOptions] = useState([]);
+  const [personalityOptions, setPersonalityOptions] = useState([]);
+  const [lengthOptions, setLengthOptions] = useState([]);
+  const [contentOptions, setContentOptions] = useState([]);
+
   const isEditing = selectedIndex === -1;
   const selectedPreset = selectedIndex != null && selectedIndex >= 0 ? presets[selectedIndex] : null;
 
   useEffect(() => {
+    // 사용자의 프리셋 목록 조회
     const fetchPresets = async () => {
       try {
         const response = await customAxios.get(`/prompts`);
@@ -43,7 +33,23 @@ function Prompts() {
       }
     };
 
+    // 옵션 데이터 조회
+    const fetchOptions = async () => {
+      try {
+        const response = await customAxios.get(`/codes/prompts`);
+        const data = response.data.data;
+
+        setToneOptions(data.tone.map(item => item.name.trim()));
+        setPersonalityOptions(data.personality.map(item => item.name));
+        setLengthOptions(data.style.map(item => item.name));
+        setContentOptions(data.content.map(item => item.name));
+      } catch (error) {
+        console.error("옵션 데이터를 가져오는 데 실패했습니다:", error);
+      }
+    };
+
     fetchPresets();
+    fetchOptions();
   }, []);
 
   useEffect(() => {
@@ -95,13 +101,7 @@ function Prompts() {
     updatedPresets.splice(selectedIndex, 1);
     setPresets(updatedPresets);
     setSelectedIndex(null);
-    setNewPreset({
-      name: "",
-      tone: "",
-      personality: "",
-      length: "",
-      content: "",
-    });
+    setNewPreset({ name: "", tone: "", personality: "", length: "", content: "" });
     setIsModified(false);
   };
 
