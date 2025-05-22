@@ -9,30 +9,23 @@ export default function User() {
 
   const [nickname, setNickname] = useState("");
   const [email, setEmail] = useState("");
-  const [joinedDate, setJoinedDate] = useState("");
 
-  // 비밀번호
+  // 비밀번호 관련 상태
+  const [currentPw, setCurrentPw] = useState("");
   const [newPw, setNewPw] = useState("");
   const [confirmPw, setConfirmPw] = useState("");
 
-  // 탈퇴
+  // 탈퇴 관련 상태
   const [confirmText, setConfirmText] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-
-  const [isVerified, setIsVerified] = useState(false);
-  const [passwordCheck, setPasswordCheck] = useState("");
-
 
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const res = await api.post("/auth/login");
-        const { name, email, createdAt } = res.data.data;
+        const res = await api.get("/user");
+        const { name, email } = res.data.data;
 
         setNickname(name);
         setEmail(email);
-        setJoinedDate(createdAt.slice(0, 10)); // YYYY-MM-DD
-        setIsLoading(false);
       } catch (err) {
         alert("로그인이 필요합니다.");
         navigate("/login");
@@ -42,11 +35,11 @@ export default function User() {
     fetchUserInfo();
   }, [navigate]);
 
-  //닉네임변경
+  // 닉네임 변경
   const handleNicknameChange = async () => {
     try {
       await api.patch("/user", {
-        name: nickname
+        name: nickname,
       });
       alert("닉네임이 성공적으로 변경되었습니다.");
     } catch (err) {
@@ -55,19 +48,20 @@ export default function User() {
     }
   };
 
-  //비밀번호변경
+  // 비밀번호 변경
   const handleChangePassword = async () => {
-    if (newPw !== confirmPw || newPw.length < 6) {
+    if (!currentPw || newPw !== confirmPw || newPw.length < 6) {
       alert("비밀번호가 일치하지 않거나 조건이 맞지 않습니다.");
       return;
     }
 
     try {
       await api.patch("/user/password", {
-        oldPassword: "",
+        oldPassword: currentPw,
         newPassword: newPw,
       });
       alert("비밀번호가 성공적으로 변경되었습니다.");
+      setCurrentPw("");
       setNewPw("");
       setConfirmPw("");
     } catch (err) {
@@ -75,7 +69,7 @@ export default function User() {
     }
   };
 
-  //탈퇴
+  // 회원 탈퇴
   const handleDelete = async () => {
     if (confirmText !== "탈퇴하겠습니다.") {
       alert('"탈퇴하겠습니다."를 정확히 입력해 주세요.');
@@ -123,18 +117,22 @@ export default function User() {
               <button onClick={handleNicknameChange}>변경하기</button>
             </div>
           </div>
-
-          {/* <div className="option-group">
-            <label>가입일자</label>
-            <div className="readonly-box">{joinedDate}</div>
-          </div> */}
         </div>
       )}
-
 
       {selectedMenu === "password" && (
         <div className="editor">
           <h2>비밀번호 변경</h2>
+
+          <div className="option-group">
+            <label>현재 비밀번호</label>
+            <input
+              type="password"
+              value={currentPw}
+              onChange={(e) => setCurrentPw(e.target.value)}
+            />
+          </div>
+
           <div className="option-group">
             <label>새 비밀번호</label>
             <input
@@ -143,6 +141,7 @@ export default function User() {
               onChange={(e) => setNewPw(e.target.value)}
             />
           </div>
+
           <div className="option-group">
             <label>비밀번호 확인</label>
             <input
@@ -151,6 +150,7 @@ export default function User() {
               onChange={(e) => setConfirmPw(e.target.value)}
             />
           </div>
+
           <button className="save-btn" onClick={handleChangePassword}>
             변경하기
           </button>
