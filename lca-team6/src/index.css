@@ -4,16 +4,16 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: #ffffffde;
-  background-color: #242424;
+  /* color: #ffffffde;
+  background-color: #242424; */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --text-color: #242424; /* 다크 모드 텍스트 색상 */
-  --bg-color: #242424; /* 다크 모드 배경 */
+  --text-color: #242424;
+  --bg-color: #ffffffde;
 }
 
 a {
