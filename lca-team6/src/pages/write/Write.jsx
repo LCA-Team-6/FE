@@ -1,8 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import customAxios from "../../api/customAxios.js"
+import customAxios from "../../api/customAxios.js";
 import "./WriteModule.css";
 
 const Write = () => {
+    const navigate = useNavigate();
     const [title, setTitle] = useState("");
     const [memo, setMemo] = useState("");
     const [aiFeedback, setAiFeedback] = useState("");
@@ -137,16 +139,6 @@ const Write = () => {
         if (!validateForm()) return;
 
         try {
-            // 일기 저장
-            const payload = {
-                title,
-                memo,
-                tone: selectOption.말투?.id,
-                personality: selectOption.성격?.id,
-                style: selectOption.스타일?.id,
-                content: selectOption.콘텐츠?.id
-            };
-
             // 피드백이 체크되어 있으면 AI 분석 요청
             if (showFeedback) {
                 try {
@@ -175,6 +167,8 @@ const Write = () => {
                     setEmotions(responseData.emotions || []);
                     setHasFeedbackResponse(true);
 
+                    alert("저장되었습니다!");
+
                     console.log("=== 상태 설정 완료 ===");
                     console.log("aiFeedback:", responseData.analysis?.substring(0, 50));
                     console.log("emotions length:", responseData.emotions?.length);
@@ -195,13 +189,12 @@ const Write = () => {
                 const saveRes = await customAxios.post('/memos', payload);
                 setSavedMemoId(saveRes.data.memoId);
                 setHasFeedbackResponse(false);
+                // 폼 초기화 (제목, 메모만), 홈으로 이동
+                alert("저장되었습니다!");
+                setTitle("");
+                setMemo("");
+                navigate("/");
             }
-
-            alert("저장되었습니다!");
-
-            // 폼 초기화 (제목, 메모만)
-            setTitle("");
-            setMemo("");
 
         } catch (err) {
             console.error("저장 에러:", err);
@@ -235,6 +228,7 @@ const Write = () => {
                 emotions: emotions
             });
             alert("피드백이 저장되었습니다.");
+            navigate("/");
         } catch (err) {
             console.error(err);
             alert("피드백 저장에 실패했습니다.");
@@ -256,13 +250,11 @@ const Write = () => {
                     <input id="title" type="text" placeholder="제목을 입력해주세요" value={title}
                         onChange={(e) => setTitle(e.target.value)} required></input>
                 </div>
-
                 <div className="form-field">
                     <label htmlFor="memo">일기쓰기</label>
                     <textarea id="memo" placeholder="내용을 입력해주세요" value={memo}
                         onChange={(e) => setMemo(e.target.value)} required rows="10"></textarea>
                 </div>
-
             </div>
 
             {/* 피드백 받기, 글저장 버튼 */}
@@ -299,7 +291,6 @@ const Write = () => {
                     </select>
 
                     {/* 미리 지정한 개인 설정 프리셋 */}
-
                     {selectedPresetId !== "직접 추가" && selectedPresetId !== 0 && selectedPresetId && (
                         <div>
                             <h4>선택된 프리셋: {presets.find(p => p.presetPromptId == selectedPresetId)?.name}</h4>
@@ -312,8 +303,6 @@ const Write = () => {
                             </div>
                         </div>
                     )}
-
-
 
                     {/* 설정 직접 추가 */}
                     {selectedPresetId === "직접 추가" && (
