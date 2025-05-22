@@ -27,7 +27,14 @@ function Prompts() {
     const fetchPresets = async () => {
       try {
         const response = await customAxios.get(`/prompts`);
-        setPresets(response.data.data);
+        const rawPresets = response.data.data;
+
+        const mappedPresets = rawPresets.map(preset => ({
+          ...preset,
+          id: preset.presetPromptId,
+        }));
+
+        setPresets(mappedPresets);
       } catch (error) {
         console.error('개인 설정 목록을 가져오는데 실패했습니다:', error);
       }
@@ -67,7 +74,6 @@ function Prompts() {
     setIsModified(false);
   };
 
-
   const handleChange = (field, id) => {
     const updated = { ...newPreset, [field]: id };
     setNewPreset(updated);
@@ -82,7 +88,7 @@ function Prompts() {
       setIsModified(changed);
     }
   };
-  
+
 
   //프리셋 프롬프트 저장
   const handleSave = async () => {
@@ -90,39 +96,56 @@ function Prompts() {
   
     try {
       const response = await customAxios.post("/prompts", newPreset);
-      const savedPreset = response.data.data;
+      const saved = response.data.data;
+
+      const savedPreset = {
+        ...saved,
+        id: saved.presetPromptId,
+      };
   
-      setPresets([...presets, savedPreset]); // 서버에서 반환된 데이터로 리스트 업데이트
-      setSelectedIndex(presets.length); // 새로 추가된 항목 선택
+      setPresets([...presets, savedPreset]);
+      setSelectedIndex(presets.length);
       setIsModified(false);
+      alert("프리셋 프롬프트가 저장되었습니다.");
     } catch (error) {
       console.error("프리셋 저장에 실패했습니다:", error);
     }
   };
-  
+
   //프리셋 프롬프트 수정
   const handleUpdate = async () => {
     try {
-      const response = await customAxios.put(`/prompts/update/${newPreset.id}`, newPreset);
-      const updatedPreset = response.data.data;
-  
+      const response = await customAxios.put(`/prompts/${newPreset.id}`, newPreset);
+      const updatedPreset = {
+        ...response.data.data,
+        id: response.data.data.presetPromptId,
+      };
+
       const updatedPresets = [...presets];
       updatedPresets[selectedIndex] = updatedPreset;
       setPresets(updatedPresets);
       setIsModified(false);
+      alert("프리셋 프롬프트가 수정되었습니다.");
     } catch (error) {
       console.error("프리셋 업데이트에 실패했습니다:", error);
     }
   };
-  
+
   //프리셋 프롬프트 삭제
-  const handleDelete = () => {
-    const updatedPresets = [...presets];
-    updatedPresets.splice(selectedIndex, 1);
-    setPresets(updatedPresets);
-    setSelectedIndex(null);
-    setNewPreset({ name: "", toneId: "", personalityId: "", styleId: "", contentId: "" });
-    setIsModified(false);
+  const handleDelete = async () => {
+    try {
+      await customAxios.delete(`/prompts/${newPreset.id}`);
+
+      const updatedPresets = [...presets];
+      updatedPresets.splice(selectedIndex, 1);
+      setPresets(updatedPresets);
+      setSelectedIndex(null);
+      setNewPreset({ name: "", toneId: "", personalityId: "", styleId: "", contentId: "" });
+      setIsModified(false);
+      alert("프리셋 프롬프트가 삭제되었습니다.");
+    } catch (error) {
+      console.error("프리셋 삭제에 실패했습니다:", error);
+    }
   };
 
   const renderOptionGroup = (label, field, options, selected) => (
@@ -130,7 +153,7 @@ function Prompts() {
       <label>{label}</label>
       <div className="option-buttons">
         {options.map((opt) => {
-          const id = opt[`${field}`]; // 예: toneId, personalityId 등
+          const id = opt[`${field}`];
           return (
             <button
               key={id}
@@ -144,7 +167,7 @@ function Prompts() {
       </div>
     </div>
   );
-  
+
   const renderViewGroup = (label, options, selected) => (
     <div className="option-group">
       <label>{label}</label>
@@ -164,7 +187,6 @@ function Prompts() {
       </div>
     </div>
   );
-  
 
   return (
     <div className="prompts-container">
