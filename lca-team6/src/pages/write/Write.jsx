@@ -31,7 +31,7 @@ const Write = () => {
                             콘텐츠: ["책", "음악", "영화", "드라마", "명언", "유튜브 영상", "웹툰", "다큐멘터리", "짧은 글귀", "뉴스 기사", "인터뷰", "강의 콘텐츠"]
                         }
                     });
-                } catch (error) {
+                } catch (error) { // 프리셋 불러오기에 실패한 경우 "직접 추가" 가능
                     console.error("프리셋 불러오기 실패", error);
                     setUserPreset({
                         "직접 추가": {
@@ -95,12 +95,12 @@ const Write = () => {
                 memo
             };
 
-            // 직접 선택 또는 프리셋 모두 selectOption에 반영
+            // 피드백 받기가 체크된 경우 preset 포함
             if (showFeedback) {
                 payload.preset = selectOption;
             }
 
-            // 체크 안했을때, 저장버튼
+            // 체크 안했을때, 저장버튼  항상 메모 저장
             const saveResponse = await customAxios.post('/memos', payload);
 
             // 피드백 받기 체크하고 저장버튼 -> ai 피드백 요청 추가
@@ -127,6 +127,12 @@ const Write = () => {
             alert("저장에 실패했습니다.");
         }
     };
+
+    const handleAiFeedbackSave = async () => {
+        const aiMemoResponse = await customAxios.post('analysis/save', {
+            analysis: aifeedback
+        })
+    }
     return (
 
         // 페이지 이름 ( 추후 스타일 수정 고려 )
@@ -239,7 +245,7 @@ const Write = () => {
 
                             <div className="group-line-up">
                                 <div></div>
-                                <button className="feedback-save-button" type="button">피드백 내용 저장하기</button>
+                                <button className="feedback-save-button" type="button" onClick={handleAiFeedbackSave}>피드백 내용 저장하기</button>
                             </div>
                         </div>
                     )}
