@@ -29,7 +29,7 @@ function Login() {
         localStorage.setItem('accessToken', response.data.data.token);        
         
         alert("로그인 성공! 어서오세요.");
-        navigate("/home"); // 홈 페이지로 이동
+        navigate("/"); // 홈 페이지로 이동
       }
     } catch (error) {
       if (error.response) {

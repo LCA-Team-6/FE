@@ -1,0 +1,22 @@
+.logo {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+}
+
+.logo-text {
+  font-family: 'Comic Sans MS', 'Marker Felt', cursive;
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  background: linear-gradient(45deg, var(--color-brown), var(--color-light-brown));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  transform: rotate(-2deg);
+}
+
+.logo:hover .logo-text {
+  transform: scale(1.05);
+} 

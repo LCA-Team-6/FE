@@ -58,17 +58,16 @@ function Register() {
 
     try {
       const response = await axios.post("http://localhost:8080/api/auth/email", { email });
-      if (response.status === 200) {
-        alert("사용 가능한 이메일입니다.");
-        setEmailChecked(true);
-        setError("");
-      } else {
+      alert("사용 가능한 이메일입니다.");
+      setEmailChecked(true);
+      setError("");
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
         setError("이미 사용 중인 이메일이에요.");
         setEmailChecked(false);
+      } else {
+        setError("서버에 연결할 수 없습니다.");
       }
-    } catch (error) {
-      setError("서버와 연결할 수 없습니다.");
-      setEmailChecked(false);
     }
   };
 

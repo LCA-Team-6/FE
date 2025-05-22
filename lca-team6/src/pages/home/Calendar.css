@@ -6,10 +6,10 @@
   --rdp-nav-height: 4rem;
   --rdp-selected-border: none;
   background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
   padding: 20px;
   width: 100%;
+  border: 2px solid var(--color-gray);
 }
 
 /* 일 칸 */

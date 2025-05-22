@@ -13,12 +13,13 @@ const colorWhite = '#FFFFFF';
 const colorBrown = '#CB997E';
 const colorDarkBrown = '#4B3E36'
 const colorLightBrown = '#DDBEA9';
+const colorSoftBrown = '#F5F0EB'
 const colorBeige = '#FFE8D6';
 const colorLightGreen = '#B7B7A4';
 const colorGreen = '#A5A58D';
 const colorDarkGreen = '#6B705C';
 const colorLightGray = '#F8F9FA';
-
+const colorGray = '#F0F2F4';
 
 
 export const GlobalStyle = css`
@@ -33,10 +34,12 @@ export const GlobalStyle = css`
         --color-white: ${colorWhite};
         --color-brown: ${colorBrown};
         --color-light-brown: ${colorLightBrown};
+        --color-soft-brown: ${colorSoftBrown};
         --color-beige: ${colorBeige};
         --color-light-green: ${colorLightGreen};
         --color-green: ${colorGreen};
         --color-dark-green: ${colorDarkGreen};
         --color-dark-brown: ${colorDarkBrown};
         --color-light-gray: ${colorLightGray};
+        --color-gray: ${colorGray};
 `;

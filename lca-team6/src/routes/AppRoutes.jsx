@@ -5,7 +5,7 @@ import Login from "../pages/login/Login";
 import Register from "../pages/login/Register";
 import Write from "../pages/write/Write";
 import Prompts from "../pages/prompts/Prompts";
-import NavBarShow from "../nav/NavBarShow";
+import NavBarShow from "../components/nav/NavBarShow";
 import User from "../pages/login/User";
 
 const AppRoutes = [
