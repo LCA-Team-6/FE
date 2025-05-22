@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import "./User.css";
 
 export default function User() {
@@ -29,12 +30,20 @@ export default function User() {
     }
   };
 
-  const handleNicknameChange = () => {
-    alert("닉네임이 변경되었습니다.");
-    // API 요청 가능
+  const handleNicknameChange = async () => {
+    try {
+      const res = await axios.patch("http://localhost:8080/api/user", {
+        name: nickname,
+      });
+      alert("닉네임이 성공적으로 변경되었습니다.");
+    } catch (err) {
+      alert(err.response?.data?.message || "닉네임 변경 실패");
+      console.error("닉네임 변경 실패:", err);
+    }
   };
 
   const handleCurrentPwCheck = () => {
+    // 실제 검증 로직이 있다면 이쪽도 API로 대체
     if (currentPw === "11") {
       setIsCurrentPwValid(true);
     } else {
@@ -42,21 +51,45 @@ export default function User() {
     }
   };
 
-  const handleChangePassword = () => {
-    if (newPw === confirmPw && newPw.length >= 6) {
-      alert("비밀번호가 변경되었습니다.");
-      // API 요청 가능
-    } else {
+  const handleChangePassword = async () => {
+    if (newPw !== confirmPw || newPw.length < 6) {
       alert("비밀번호가 일치하지 않거나 조건이 맞지 않습니다.");
+      return;
+    }
+
+    try {
+      await axios.patch("http://localhost:8080/api/user/password", {
+        oldPassword: currentPw,
+        newPassword: newPw,
+      });
+      alert("비밀번호가 성공적으로 변경되었습니다.");
+      setCurrentPw("");
+      setNewPw("");
+      setConfirmPw("");
+      setIsCurrentPwValid(false);
+    } catch (err) {
+      alert(err.response?.data?.message || "비밀번호 변경 실패");
+      console.error(err);
     }
   };
 
-  const handleDelete = () => {
-    if (confirmText === "탈퇴하겠습니다.") {
-      alert("회원 탈퇴 처리되었습니다.");
-      // API 호출 및 로그아웃 처리
+  const handleDelete = async () => {
+    if (confirmText !== "탈퇴하겠습니다.") {
+      alert('"탈퇴하겠습니다."를 정확히 입력해 주세요.');
+      return;
+    }
+
+    try {
+      const response = await axios.delete("/api/user");
+      alert(response.data.message || "회원 탈퇴가 완료되었습니다.");
+
+      // 로그아웃 또는 리디렉션 처리
+    } catch (err) {
+      alert(err.response?.data?.message || "회원 탈퇴 중 오류가 발생했습니다.");
+      console.error("회원 탈퇴 실패:", err);
     }
   };
+
 
   return (
     <div className="user-container">
