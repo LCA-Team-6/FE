@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../../api/customAxios";
 import "./User.css";
 
 export default function User() {
@@ -32,7 +32,7 @@ export default function User() {
 
   const handleNicknameChange = async () => {
     try {
-      const res = await axios.patch("http://localhost:8080/api/user", {
+      const res = await api.patch("/user", {
         name: nickname,
       });
       alert("닉네임이 성공적으로 변경되었습니다.");
@@ -58,7 +58,7 @@ export default function User() {
     }
 
     try {
-      await axios.patch("http://localhost:8080/api/user/password", {
+      await api.patch("/user/password", {
         oldPassword: currentPw,
         newPassword: newPw,
       });
@@ -80,7 +80,7 @@ export default function User() {
     }
 
     try {
-      const response = await axios.delete("/api/user");
+      const response = await api.delete("/user");
       alert(response.data.message || "회원 탈퇴가 완료되었습니다.");
 
       // 로그아웃 또는 리디렉션 처리
