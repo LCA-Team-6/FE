@@ -1,6 +1,7 @@
 // src/pages/prompts/Prompts.jsx
 
 import { useEffect, useState } from "react";
+import customAxios from "../../api/customAxios";
 import "./Prompts.css";
 
 const toneOptions = [
@@ -31,6 +32,19 @@ function Prompts() {
 
   const isEditing = selectedIndex === -1;
   const selectedPreset = selectedIndex != null && selectedIndex >= 0 ? presets[selectedIndex] : null;
+
+  useEffect(() => {
+    const fetchPresets = async () => {
+      try {
+        const response = await customAxios.get(`/prompts`);
+        setPresets(response.data.data);
+      } catch (error) {
+        console.error('개인 설정 목록을 가져오는데 실패했습니다:', error);
+      }
+    };
+
+    fetchPresets();
+  }, []);
 
   useEffect(() => {
     if (selectedIndex != null && selectedIndex >= 0) {
