@@ -73,12 +73,12 @@ button:focus-visible {
 }
 @media (prefers-color-scheme: dark) {
   :root {
- 
+    --input-text-color: #030303;
   }
   p {
     color: var(--color-light-green);
   }
   button {
-    color: #1a1a1a;
+    color: #fff;
   }
 }
