@@ -1,13 +1,9 @@
-/* src/pages/register/Register.css */
-
 .register-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  padding-left: 400px;
-  padding-right: 400px;
-  background-color: rgb(198, 220, 242);
+  width: 100%;
+  max-width: 1000px;
 }
 
 .register-box {
@@ -21,7 +17,7 @@
 }
 
 .register-box h2 {
-  color: rgb(102, 145, 231);
+  color: var(--color-dark-green);
   font-size: 24px;
 }
 
@@ -36,7 +32,7 @@
 
 .register-button {
   padding: 12px;
-  background-color: #4a90e2;
+  background-color: var(--color-light-green);
   color: white;
   font-weight: bold;
   border: none;
@@ -46,7 +42,22 @@
 }
 
 .register-button:hover {
-  background-color: #357ae8;
+  background-color: var(--color-dark-green);
+}
+
+.register-button-c {
+  margin-bottom: 16px;
+  padding: 10px;
+  background-color: var(--color-light-green);
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.register-button-c:hover {
+  background-color: var(--color-dark-green);
 }
 
 .back-button {
