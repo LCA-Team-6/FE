@@ -4,6 +4,9 @@
   max-width: 1000px;
   min-height: 1000px;
   font-family: Arial, sans-serif;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar {
@@ -112,7 +115,28 @@
 }
 
 .save-btn:hover:not(:disabled) {
-  background-color: #357ae8;
+  background-color: var(--color-dark-brown);
+}
+
+.save-btn-n {
+  padding: 10px 16px;
+  margin-left: 10px;
+  font-size: 14px;
+  background-color: var(--color-light-brown);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.save-btn-n:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+.save-btn-n:hover:not(:disabled) {
+  background-color: var(--color-dark-brown);
 }
 
 .warning-box {

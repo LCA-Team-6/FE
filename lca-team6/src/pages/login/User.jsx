@@ -114,7 +114,7 @@ export default function User() {
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
               />
-              <button onClick={handleNicknameChange}>변경하기</button>
+              <button className="save-btn-n" onClick={handleNicknameChange}>변경하기</button>
             </div>
           </div>
         </div>
