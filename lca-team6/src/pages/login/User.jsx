@@ -1,39 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../../api/customAxios";
 import "./User.css";
 
 export default function User() {
-  const [isVerified, setIsVerified] = useState(false);
-  const [passwordCheck, setPasswordCheck] = useState("");
+  const navigate = useNavigate();
   const [selectedMenu, setSelectedMenu] = useState("info");
 
-  // 회원정보 수정 관련
-  const [nickname, setNickname] = useState("기존닉네임"); // 예시
-  const email = "user@example.com";
-  const joinedDate = "2024-01-15";
+  const [nickname, setNickname] = useState("");
+  const [email, setEmail] = useState("");
+  const [joinedDate, setJoinedDate] = useState("");
 
-  // 비밀번호 변경 관련
-  const [currentPw, setCurrentPw] = useState("");
+  // 비밀번호
   const [newPw, setNewPw] = useState("");
   const [confirmPw, setConfirmPw] = useState("");
-  const [isCurrentPwValid, setIsCurrentPwValid] = useState(false);
 
-  // 회원 탈퇴 관련
+  // 탈퇴
   const [confirmText, setConfirmText] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleVerifyPassword = () => {
-    // 임시 비밀번호 검증 (실제론 API 호출)
-    if (passwordCheck === "11") {
-      setIsVerified(true);
-    } else {
-      alert("비밀번호가 올바르지 않습니다.");
-    }
-  };
+  const [isVerified, setIsVerified] = useState(false);
+  const [passwordCheck, setPasswordCheck] = useState("");
 
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const res = await api.get("/user/me");
+        const { name, email, createdAt } = res.data.data;
+
+        setNickname(name);
+        setEmail(email);
+        setJoinedDate(createdAt.slice(0, 10)); // YYYY-MM-DD
+        setIsLoading(false);
+      } catch (err) {
+        alert("로그인이 필요합니다.");
+        navigate("/login");
+      }
+    };
+
+    fetchUserInfo();
+  }, [navigate]);
+
+  //닉네임변경
   const handleNicknameChange = async () => {
     try {
-      const res = await api.patch("/user", {
-        name: nickname,
+      await api.patch("/user", {
+        name: nickname
       });
       alert("닉네임이 성공적으로 변경되었습니다.");
     } catch (err) {
@@ -42,15 +55,7 @@ export default function User() {
     }
   };
 
-  const handleCurrentPwCheck = () => {
-    // 실제 검증 로직이 있다면 이쪽도 API로 대체
-    if (currentPw === "11") {
-      setIsCurrentPwValid(true);
-    } else {
-      alert("현재 비밀번호가 일치하지 않습니다.");
-    }
-  };
-
+  //비밀번호변경
   const handleChangePassword = async () => {
     if (newPw !== confirmPw || newPw.length < 6) {
       alert("비밀번호가 일치하지 않거나 조건이 맞지 않습니다.");
@@ -59,20 +64,18 @@ export default function User() {
 
     try {
       await api.patch("/user/password", {
-        oldPassword: currentPw,
+        oldPassword: "", // 백엔드가 현재 비밀번호 검증 안 할 경우 공란 가능
         newPassword: newPw,
       });
       alert("비밀번호가 성공적으로 변경되었습니다.");
-      setCurrentPw("");
       setNewPw("");
       setConfirmPw("");
-      setIsCurrentPwValid(false);
     } catch (err) {
       alert(err.response?.data?.message || "비밀번호 변경 실패");
-      console.error(err);
     }
   };
 
+  //탈퇴
   const handleDelete = async () => {
     if (confirmText !== "탈퇴하겠습니다.") {
       alert('"탈퇴하겠습니다."를 정확히 입력해 주세요.');
@@ -80,16 +83,14 @@ export default function User() {
     }
 
     try {
-      const response = await api.delete("/user");
-      alert(response.data.message || "회원 탈퇴가 완료되었습니다.");
-
-      // 로그아웃 또는 리디렉션 처리
+      const res = await api.delete("/user");
+      alert(res.data.message || "회원 탈퇴가 완료되었습니다.");
+      localStorage.removeItem("accessToken");
+      navigate("/login");
     } catch (err) {
-      alert(err.response?.data?.message || "회원 탈퇴 중 오류가 발생했습니다.");
-      console.error("회원 탈퇴 실패:", err);
+      alert(err.response?.data?.message || "회원 탈퇴 중 오류 발생");
     }
   };
-
 
   return (
     <div className="user-container">
@@ -102,119 +103,88 @@ export default function User() {
         </ul>
       </div>
 
-      {!isVerified ? (
+      {selectedMenu === "info" && (
         <div className="editor">
-          <h2>비밀번호 확인</h2>
-          <input
-            type="password"
-            placeholder="비밀번호 입력"
-            value={passwordCheck}
-            onChange={(e) => setPasswordCheck(e.target.value)}
-          />
-          <button className="save-btn" onClick={handleVerifyPassword}>
-            확인
+          <h2>회원정보 수정</h2>
+
+          <div className="option-group">
+            <label>이메일</label>
+            <div className="readonly-box">{email}</div>
+          </div>
+
+          <div className="option-group">
+            <label>닉네임</label>
+            <div className="nickname-box">
+              <input
+                type="text"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+              />
+              <button onClick={handleNicknameChange}>변경하기</button>
+            </div>
+          </div>
+
+          <div className="option-group">
+            <label>가입일자</label>
+            <div className="readonly-box">{joinedDate}</div>
+          </div>
+        </div>
+      )}
+
+
+      {selectedMenu === "password" && (
+        <div className="editor">
+          <h2>비밀번호 변경</h2>
+          <div className="option-group">
+            <label>새 비밀번호</label>
+            <input
+              type="password"
+              value={newPw}
+              onChange={(e) => setNewPw(e.target.value)}
+            />
+          </div>
+          <div className="option-group">
+            <label>비밀번호 확인</label>
+            <input
+              type="password"
+              value={confirmPw}
+              onChange={(e) => setConfirmPw(e.target.value)}
+            />
+          </div>
+          <button className="save-btn" onClick={handleChangePassword}>
+            변경하기
           </button>
         </div>
-      ) : (
-        <>
-          {selectedMenu === "info" && (
-            <div className="editor">
-              <h2>회원정보 수정</h2>
+      )}
 
-              <div className="option-group">
-                <label>이메일</label>
-                <div className="readonly-box">{email}</div>
-              </div>
+      {selectedMenu === "delete" && (
+        <div className="editor">
+          <h2>회원 탈퇴</h2>
 
-              <div className="option-group">
-                <label>닉네임</label>
-                <div className="nickname-box">
-                  <input
-                    type="text"
-                    value={nickname}
-                    onChange={(e) => setNickname(e.target.value)}
-                  />
-                  <button onClick={handleNicknameChange}>변경하기</button>
-                </div>
-              </div>
-
-              <div className="option-group">
-                <label>가입일자</label>
-                <div className="readonly-box">{joinedDate}</div>
-              </div>
+          <div className="option-group">
+            <label>주의사항</label>
+            <div className="warning-box">
+              탈퇴 시 모든 정보가 삭제되며 복구가 불가능합니다. 신중하게 선택해 주세요.
             </div>
-          )}
+          </div>
 
-          {selectedMenu === "password" && (
-            <div className="editor">
-              <h2>비밀번호 변경</h2>
+          <div className="option-group">
+            <label>"탈퇴하겠습니다."를 입력하세요</label>
+            <input
+              type="text"
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+            />
+          </div>
 
-              {!isCurrentPwValid ? (
-                <div className="option-group">
-                  <label>현재 비밀번호</label>
-                  <input
-                    type="password"
-                    value={currentPw}
-                    onChange={(e) => setCurrentPw(e.target.value)}
-                  />
-                  <button onClick={handleCurrentPwCheck}>확인</button>
-                </div>
-              ) : (
-                <>
-                  <div className="option-group">
-                    <label>새 비밀번호</label>
-                    <input
-                      type="password"
-                      value={newPw}
-                      onChange={(e) => setNewPw(e.target.value)}
-                    />
-                  </div>
-                  <div className="option-group">
-                    <label>비밀번호 확인</label>
-                    <input
-                      type="password"
-                      value={confirmPw}
-                      onChange={(e) => setConfirmPw(e.target.value)}
-                    />
-                  </div>
-                  <button className="save-btn" onClick={handleChangePassword}>
-                    변경하기
-                  </button>
-                </>
-              )}
-            </div>
-          )}
-
-          {selectedMenu === "delete" && (
-            <div className="editor">
-              <h2>회원 탈퇴</h2>
-
-              <div className="option-group">
-                <label>주의사항</label>
-                <div className="warning-box">
-                  탈퇴 시 모든 정보가 삭제되며 복구가 불가능합니다. 신중하게 선택해 주세요.
-                </div>
-              </div>
-
-              <div className="option-group">
-                <label>"탈퇴하겠습니다."를 입력하세요</label>
-                <input
-                  type="text"
-                  value={confirmText}
-                  onChange={(e) => setConfirmText(e.target.value)}
-                />
-              </div>
-
-              <button
-                className="save-btn"
-                onClick={handleDelete}
-                disabled={confirmText !== "탈퇴하겠습니다."}
-              >
-                탈퇴하기
-              </button>
-            </div>
-          )}
-        </>
+          <button
+            className="save-btn"
+            onClick={handleDelete}
+            disabled={confirmText !== "탈퇴하겠습니다."}
+          >
+            탈퇴하기
+          </button>
+        </div>
       )}
     </div>
   );
