@@ -65,7 +65,12 @@ const Write = () => {
 
         if (!e.target.checked) {
             setSelectPreset("선택해주세요");
-            setSelectOption([]);
+            setSelectOption({
+                말투: "",
+                성격: "",
+                스타일: "",
+                콘텐츠: ""
+            });
         }
 
     }
