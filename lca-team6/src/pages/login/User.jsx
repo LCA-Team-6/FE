@@ -26,7 +26,7 @@ export default function User() {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const res = await api.get("/user/me");
+        const res = await api.post("/auth/login");
         const { name, email, createdAt } = res.data.data;
 
         setNickname(name);
@@ -64,7 +64,7 @@ export default function User() {
 
     try {
       await api.patch("/user/password", {
-        oldPassword: "", // 백엔드가 현재 비밀번호 검증 안 할 경우 공란 가능
+        oldPassword: "",
         newPassword: newPw,
       });
       alert("비밀번호가 성공적으로 변경되었습니다.");
@@ -124,10 +124,10 @@ export default function User() {
             </div>
           </div>
 
-          <div className="option-group">
+          {/* <div className="option-group">
             <label>가입일자</label>
             <div className="readonly-box">{joinedDate}</div>
-          </div>
+          </div> */}
         </div>
       )}
 
