@@ -7,10 +7,10 @@ function Prompts() {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [newPreset, setNewPreset] = useState({
     name: "",
-    tone: "",
-    personality: "",
-    length: "",
-    content: "",
+    toneId: "",
+    personalityId: "",
+    styleId: "",
+    contentId: "",
   });
   const [isModified, setIsModified] = useState(false);
 
@@ -39,10 +39,10 @@ function Prompts() {
         const response = await customAxios.get(`/codes/prompts`);
         const data = response.data.data;
 
-        setToneOptions(data.tone.map(item => item.name.trim()));
-        setPersonalityOptions(data.personality.map(item => item.name));
-        setLengthOptions(data.style.map(item => item.name));
-        setContentOptions(data.content.map(item => item.name));
+        setToneOptions(data.tone);
+        setPersonalityOptions(data.personality);
+        setLengthOptions(data.style);
+        setContentOptions(data.content);        
       } catch (error) {
         console.error("옵션 데이터를 가져오는 데 실패했습니다:", error);
       }
@@ -62,46 +62,66 @@ function Prompts() {
   const handleSelect = (index) => setSelectedIndex(index);
 
   const handleNew = () => {
-    setNewPreset({ name: "", tone: "", personality: "", length: "", content: "" });
+    setNewPreset({ name: "", toneId: "", personalityId: "", styleId: "", contentId: "" });
     setSelectedIndex(-1);
     setIsModified(false);
   };
 
-  const handleChange = (field, value) => {
-    const updated = { ...newPreset, [field]: value };
-    setNewPreset(updated);
 
+  const handleChange = (field, id) => {
+    const updated = { ...newPreset, [field]: id };
+    setNewPreset(updated);
+  
     if (selectedPreset) {
       const changed =
         updated.name !== selectedPreset.name ||
-        updated.tone !== selectedPreset.tone ||
-        updated.personality !== selectedPreset.personality ||
-        updated.length !== selectedPreset.length ||
-        updated.content !== selectedPreset.content;
+        updated.toneId !== selectedPreset.toneId ||
+        updated.personalityId !== selectedPreset.personalityId ||
+        updated.styleId !== selectedPreset.styleId ||
+        updated.contentId !== selectedPreset.contentId;
       setIsModified(changed);
     }
   };
+  
 
-  const handleSave = () => {
-    if (!newPreset.name || !newPreset.tone || !newPreset.personality || !newPreset.length || !newPreset.content) return;
-    setPresets([...presets, newPreset]);
-    setSelectedIndex(presets.length);
-    setIsModified(false);
+  //프리셋 프롬프트 저장
+  const handleSave = async () => {
+    if (!newPreset.name || !newPreset.toneId || !newPreset.personalityId || !newPreset.styleId || !newPreset.contentId) return;
+  
+    try {
+      const response = await customAxios.post("/prompts", newPreset);
+      const savedPreset = response.data.data;
+  
+      setPresets([...presets, savedPreset]); // 서버에서 반환된 데이터로 리스트 업데이트
+      setSelectedIndex(presets.length); // 새로 추가된 항목 선택
+      setIsModified(false);
+    } catch (error) {
+      console.error("프리셋 저장에 실패했습니다:", error);
+    }
   };
-
-  const handleUpdate = () => {
-    const updatedPresets = [...presets];
-    updatedPresets[selectedIndex] = newPreset;
-    setPresets(updatedPresets);
-    setIsModified(false);
+  
+  //프리셋 프롬프트 수정
+  const handleUpdate = async () => {
+    try {
+      const response = await customAxios.put(`/prompts/update/${newPreset.id}`, newPreset);
+      const updatedPreset = response.data.data;
+  
+      const updatedPresets = [...presets];
+      updatedPresets[selectedIndex] = updatedPreset;
+      setPresets(updatedPresets);
+      setIsModified(false);
+    } catch (error) {
+      console.error("프리셋 업데이트에 실패했습니다:", error);
+    }
   };
-
+  
+  //프리셋 프롬프트 삭제
   const handleDelete = () => {
     const updatedPresets = [...presets];
     updatedPresets.splice(selectedIndex, 1);
     setPresets(updatedPresets);
     setSelectedIndex(null);
-    setNewPreset({ name: "", tone: "", personality: "", length: "", content: "" });
+    setNewPreset({ name: "", toneId: "", personalityId: "", styleId: "", contentId: "" });
     setIsModified(false);
   };
 
@@ -109,31 +129,42 @@ function Prompts() {
     <div className="option-group">
       <label>{label}</label>
       <div className="option-buttons">
-        {options.map((opt) => (
-          <button
-            key={opt}
-            className={selected === opt ? "selected" : ""}
-            onClick={() => handleChange(field, opt)}
-          >
-            {opt}
-          </button>
-        ))}
+        {options.map((opt) => {
+          const id = opt[`${field}`]; // 예: toneId, personalityId 등
+          return (
+            <button
+              key={id}
+              className={selected === id ? "selected" : ""}
+              onClick={() => handleChange(field, id)}
+            >
+              {opt.name}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
-
+  
   const renderViewGroup = (label, options, selected) => (
     <div className="option-group">
       <label>{label}</label>
       <div className="option-buttons">
-        {options.map((opt) => (
-          <button key={opt} className={selected === opt ? "selected" : ""} disabled>
-            {opt}
-          </button>
-        ))}
+        {options.map((opt) => {
+          const id = opt[`${label.toLowerCase()}Id`] || opt.id;
+          return (
+            <button
+              key={id}
+              className={selected === id ? "selected" : ""}
+              disabled
+            >
+              {opt.name}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
+  
 
   return (
     <div className="prompts-container">
@@ -157,10 +188,10 @@ function Prompts() {
             value={newPreset.name}
             onChange={(e) => handleChange("name", e.target.value)}
           />
-          {renderOptionGroup("톤/말투", "tone", toneOptions, newPreset.tone)}
-          {renderOptionGroup("성격", "personality", personalityOptions, newPreset.personality)}
-          {renderOptionGroup("길이", "length", lengthOptions, newPreset.length)}
-          {renderOptionGroup("컨텐츠", "content", contentOptions, newPreset.content)}
+          {renderOptionGroup("톤/말투", "toneId", toneOptions, newPreset.toneId)}
+          {renderOptionGroup("성격", "personalityId", personalityOptions, newPreset.personalityId)}
+          {renderOptionGroup("길이", "styleId", lengthOptions, newPreset.styleId)}
+          {renderOptionGroup("컨텐츠", "contentId", contentOptions, newPreset.contentId)}
           <button className="save-btn" onClick={handleSave}>저장하기</button>
         </div>
       ) : selectedPreset ? (
@@ -171,10 +202,10 @@ function Prompts() {
             value={newPreset.name}
             onChange={(e) => handleChange("name", e.target.value)}
           />
-          {renderOptionGroup("톤/말투", "tone", toneOptions, newPreset.tone)}
-          {renderOptionGroup("성격", "personality", personalityOptions, newPreset.personality)}
-          {renderOptionGroup("길이", "length", lengthOptions, newPreset.length)}
-          {renderOptionGroup("컨텐츠", "content", contentOptions, newPreset.content)}
+          {renderOptionGroup("톤/말투", "toneId", toneOptions, newPreset.toneId)}
+          {renderOptionGroup("성격", "personalityId", personalityOptions, newPreset.personalityId)}
+          {renderOptionGroup("길이", "styleId", lengthOptions, newPreset.styleId)}
+          {renderOptionGroup("컨텐츠", "contentId", contentOptions, newPreset.contentId)}
           <div style={{ marginTop: "20px" }}>
             <button
               className="save-btn"
