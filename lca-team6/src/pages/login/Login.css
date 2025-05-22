@@ -1,13 +1,10 @@
-/* src/pages/login/Login.css */
-
 .login-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  padding-left: 400px;
-  padding-right: 400px;
-  background-color: rgb(215, 229, 192);
+  width: 100%;
+  max-width: 1000px;
+  /* background-color: var(--color-light-green); */
 }
 
 .login-box {
@@ -21,7 +18,7 @@
 }
 
 .login-box h2 {
-  color: rgb(100, 158, 102);
+  color: var(--color-dark-green);
   font-size: 24px;
 }
 
@@ -35,7 +32,7 @@
 
 .login-button {
   padding: 12px;
-  background-color: rgb(100, 158, 102);
+  background-color: var(--color-light-green);
   color: white;
   font-weight: bold;
   border: none;
@@ -45,13 +42,13 @@
 }
 
 .login-button:hover {
-  background-color: #45a049;
+  background-color: var(--color-dark-green);
 }
 
 .text-button {
   background: none;
   border: none;
-  color: #007bff;
+  color: var(--color-dark-green);
   cursor: pointer;
   font-size: 14px;
   margin-bottom: 5px;
