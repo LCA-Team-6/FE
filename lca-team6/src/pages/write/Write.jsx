@@ -92,8 +92,29 @@ const Write = () => {
         });
     };
 
+    // 사용자 입력 검증로직
+    const validateForm = () => {
+        if (!title.trim()) {
+            alert("제목을 입력해주세요!");
+            return false;
+        }
+        if (!memo.trim()) {
+            alert("일기 내용을 입력해주세요!");
+            return false;
+        }
+
+        // 피드백 받기 체크했는데 프리셋 안 골랐을 때
+        if (showFeedback && !selectPreset) {
+            alert("프리셋을 선택해주세요!");
+            return false;
+        }
+
+        return true;
+    };
+
     // 저장하기 버튼 기능 ( 체크박스 체크 여부에 따른 기능 분리 )
     const handleSave = async () => {
+        if (!validateForm()) return;
         try {
             const payload = {
                 title,
