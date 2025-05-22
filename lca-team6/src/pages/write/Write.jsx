@@ -1,17 +1,21 @@
 import { useEffect, useState } from "react";
 import customAxios from "../../api/customAxios.js"
 import "./WriteModule.css";
-import axios from "axios";
 
 const Write = () => {
     const [title, setTitle] = useState("");
     const [memo, setMemo] = useState("");
-    const [aifeedback, setAiFeedback] = useState("");
+    const [aiFeedback, setAiFeedback] = useState("");
     const [showFeedback, setShowFeedback] = useState(false);
-    const [selectPreset, setSelectPreset] = useState("");
-    const [userPreset, setUserPreset] = useState({});
+    const [emotions, setEmotions] = useState([]);
+
+    const [presets, setPresets] = useState([]);
+    const [options, setOptions] = useState({
+        tone: [], personality: [], style: [], content: []
+    })
     const [hasFeedbackResponse, setHasFeedbackResponse] = useState(false);
     const [savedMemoId,setSavedMemoId] = useState(null);
+    const [selectedPresetId,setSelectedPresetId] = useState(0);
     const [selectOption, setSelectOption] = useState({
         말투: null,
         성격: null,
@@ -23,77 +27,53 @@ const Write = () => {
         if (showFeedback) {
             (async () => {
                 try {
-                    const response = await customAxios.get('/codes/prompts');
+                    const { data: promptsRes } = await customAxios.get('/prompts');
 
-                    // API 응답에서 받은 데이터를 ID와 이름을 가진 객체 배열로 변환
-                    const toneOptions = response.data.data.tone.map(item => ({ id: item.id, name: item.name }));
-                    const personalityOptions = response.data.data.personality.map(item => ({ id: item.id, name: item.name }));
-                    const styleOptions = response.data.data.style.map(item => ({ id: item.id, name: item.name }));
-                    const contentOptions = response.data.data.content.map(item => ({ id: item.id, name: item.name }));
+                    setPresets(promptsRes.data);
 
-                    setUserPreset({
-                        ...response.data,
-                        "직접 추가": {
-                            말투: toneOptions,
-                            성격: personalityOptions,
-                            스타일: styleOptions,
-                            콘텐츠: contentOptions
-                        }
+                    const { data: codesRes } = await customAxios.get('/codes/prompts');
+
+                    setOptions({
+                        tone: codesRes.data.tone.map(item => ({ id: item.toneId, name: item.name })),
+                        personality: codesRes.data.personality.map(item => ({ id: item.personalityId, name: item.name })),
+                        style: codesRes.data.style.map(item => ({ id: item.styleId, name: item.name })),
+                        content: codesRes.data.content.map(item => ({ id: item.contentId, name: item.name }))
                     });
+
                 } catch (error) { // 프리셋 불러오기에 실패한 경우 "직접 추가" 가능
                     console.error("프리셋 불러오기 실패", error);
-                     const defaultTone = [
-                        { id: 1, name: "정중한(존댓말)" }, { id: 2, name: "친구같은(반말)" }, { id: 3, name: "감성적인" },
-                        { id: 4, name: "건조한" }, { id: 5, name: "유쾌한" }, { id: 6, name: "차분한" },
-                        { id: 7, name: "따뜻한" }, { id: 8, name: "논리적인" }, { id: 9, name: "직설적인" }
-                    ];
-                    const defaultPersonality = [
-                        { id: 1, name: "따뜻한 상담자형" }, { id: 2, name: "냉철한 분석가형" }, { id: 3, name: "친구같은 말동무형" },
-                        { id: 4, name: "꼼꼼한 멘토형" }, { id: 5, name: "긍정적인 응원자형" }, { id: 6, name: "현실적인 조언자형" },
-                        { id: 7, name: "공감 중심 대화자형" }, { id: 8, name: "조용한 경청자형" }, { id: 9, name: "활발한 리액션형" }
-                    ];
-                    const defaultStyle = [
-                        { id: 1, name: "짧고 굵게" }, { id: 2, name: "감성적 서술" }, { id: 3, name: "상세 피드백" },
-                        { id: 4, name: "분석 + 제안" }, { id: 5, name: "체크리스트 제공" }, { id: 6, name: "스토리텔링 기반" }
-                    ];
-                    const defaultContent = [
-                        { id: 1, name: "책" }, { id: 2, name: "음악" }, { id: 3, name: "영화" },
-                        { id: 4, name: "드라마" }, { id: 5, name: "명언" }, { id: 6, name: "유튜브 영상" },
-                        { id: 7, name: "웹툰" }, { id: 8, name: "다큐멘터리" }, { id: 9, name: "짧은 글귀" },
-                        { id: 10, name: "뉴스 기사" }, { id: 11, name: "인터뷰" }, { id: 12, name: "강의 콘텐츠" }
-                    ];
-                    setUserPreset({
-                        "직접 추가": {
-                            말투: defaultTone,
-                            성격: defaultPersonality,
-                            스타일: defaultStyle,
-                            콘텐츠: defaultContent
-                        }
-                    });
                 }
             })();
         }
+        
     }, [showFeedback]);
 
     useEffect(() => {
-        if (selectPreset && selectPreset !== "직접 추가" && userPreset[selectPreset]) {
-            setSelectOption(userPreset[selectPreset]);
-        } else if (selectPreset === "직접 추가") {
-            setSelectOption({
-                말투: null,
-                성격: null,
-                스타일: null,
-                콘텐츠: null
-            });
+        if (selectedPresetId === 0) {
+            setSelectOption({ 말투: null, 성격: null, 스타일: null, 콘텐츠: null });
+        } else if (selectedPresetId === "직접 추가") {
+            setSelectOption({ 말투: null, 성격: null, 스타일: null, 콘텐츠: null });
+        } else {
+            const preset = presets.find(x => x.presetPromptId === selectedPresetId);
+            if (preset) {
+                const 말투 = options.tone.find(option => option.id === preset.toneId);
+                const 성격 = options.personality.find(option => option.id === preset.personalityId);
+                const 스타일 = options.style.find(option => option.id === preset.styleId);
+                const 콘텐츠 = options.content.find(option => option.id === preset.contentId);
+
+                console.log("찾은 옵션들:", { 말투, 성격, 스타일, 콘텐츠 });
+
+                setSelectOption({ 말투, 성격, 스타일, 콘텐츠 });
+            }
         }
-    }, [selectPreset, userPreset]);
+    }, [selectedPresetId, presets, options]);
 
     // 피드백받기 체크박스 설정
     const handleFeedbackChecked = (e) => {
         setShowFeedback(e.target.checked);
 
         if (!e.target.checked) {
-            setSelectPreset("");
+            setSelectedPresetId(0);
             setSelectOption({
                 말투: null,
                 성격: null,
@@ -135,13 +115,13 @@ const Write = () => {
         }
 
         // 피드백 받기 체크했는데 프리셋 안 골랐을 때
-        if (showFeedback && !selectPreset) {
+        if (showFeedback && !selectedPresetId) {
             alert("프리셋을 선택해주세요!");
             return false;
         }
 
         // "직접 추가"를 선택했을 때 모든 타입에 대해 하나 이상 선택되었는지 확인.
-        if (showFeedback && selectPreset === "직접 추가") {
+        if (showFeedback && selectedPresetId === "직접 추가") {
             const selectedOptions = Object.values(selectOption).filter(option => option !== null);
             if (selectedOptions.length === 0) {
                 alert("피드백을 받으려면 옵션을 선택해주세요!");
@@ -153,68 +133,50 @@ const Write = () => {
     };
 
     // 저장하기 버튼 기능 ( 체크박스 체크 여부에 따른 기능 분리 )
-    const handleSave = async () => {
-        if (!validateForm()) return;
-        try {
-            const payload = {
-               title: title,
-               memo: memo
-            };
+     const handleSave = async () => {
+    if (!validateForm()) return;
+    try {
+      const payload = { title, memo,
+        tone: selectOption.말투?.id,
+        personality: selectOption.성격?.id,
+        style: selectOption.스타일?.id,
+        content: selectOption.콘텐츠?.id
+      };
+      if (showFeedback) {
+        payload.presetPromptId = selectedPresetId || null;
+      }
 
-            console.log("전송할 데이터:", payload);
+      const saveRes = await customAxios.post('/memos', payload);
+      setSavedMemoId(saveRes.data.memoId);
 
-            // 피드백 받기가 체크된 경우 preset 포함
-            if (showFeedback) {
-                const selectedPresetIds = {};
-                for (const type in selectOption) {
-                    if (selectOption[type]) { // 선택된 옵션이 있을 경우에만
-                        selectedPresetIds[type] = selectOption[type].id;
-                    }
-                }
-                payload.preset = selectedPresetIds;
-            }
+      if (showFeedback) {
+        const analysisRes = await customAxios.post('/analysis', payload);
+        setAiFeedback(analysisRes.data.analysis);
+        setEmotions(analysisRes.data.emotions || []);
+        setHasFeedbackResponse(true);
+      } else {
+        setHasFeedbackResponse(false);
+      }
 
-            // 체크 안했을때, 저장버튼  항상 메모 저장
-            const saveResponse = await customAxios.post('/memos', payload);
-            
-            console.log("저장 성공:", saveResponse.data);
-
-            // 피드백 받기 체크하고 저장버튼 -> ai 피드백 요청 추가
-            if (showFeedback) {
-                const aiPresetPayload = {};
-                for (const type in selectOption) {
-                    if (selectOption[type]) {
-                        aiPresetPayload[type] = selectOption[type].id;
-                    }
-                }
-                const aiResponse = await customAxios.post('/analysis', {
-                    title,
-                    memo,
-                    preset: aiPresetPayload // AI 분석 요청에도 ID로 구성된 프리셋을 보냄
-                });
-
-                setAiFeedback(aiResponse.data.analysis);
-                setHasFeedbackResponse(true);
-            } else {
-                setHasFeedbackResponse(false);
-            }
-
-            alert("저장되었습니다!");
-            // 초기화
-            setTitle("");
-            setMemo("");
-
-        } catch (error) {
-            console.error("저장 실패", error);
-            alert("저장에 실패했습니다.");
-        }
-    };
+      alert("저장되었습니다!");
+      setTitle(""); setMemo("");
+    } catch (err) {
+      console.error(err);
+      alert("저장에 실패했습니다.");
+    }
+  };
 
     const handleAiFeedbackSave = async () => {
-        const aiMemoResponse = await customAxios.post('analysis/save', {
-            analysis: aifeedback
-        })
-    }
+        const aiMemoResponse = await customAxios.post('/analysis/save', {
+            
+            memoId: savedMemoId,
+            presetPromptId: selectedPresetId,
+            analysis: aiFeedback,
+            emotions: emotions 
+        });
+        alert("피드백이 저장되었습니다.");
+    };
+
     return (
 
         // 페이지 이름 ( 추후 스타일 수정 고려 )
@@ -256,49 +218,43 @@ const Write = () => {
                     <label>프리셋 선택하기  </label>
                     <select
                         className="preset-select"
-                        value={selectPreset}
+                        value={selectedPresetId}
                         onChange={(e) => {
-                            setSelectPreset(e.target.value);
+                            setSelectedPresetId(e.target.value);
                             // setSelectOption([]); //선택 변경시 초기화 시켜주기 useEffect에서 처리하는 것으로 변경
                         }}>
                         <option value="">
                             선택해주세요
                         </option>
-                        {Object.keys(userPreset).map((presetName) => (
-                            <option key={presetName} value={presetName}>
-                                {presetName}
+                        {presets.map((preset) => (
+                            <option key={preset.presetPromptId} value={preset.presetPromptId}>
+                                {preset.name}
                             </option>
                         ))}
+                        <option value="직접 추가">직접 추가</option>
                     </select>
 
                     {/* 미리 지정한 개인 설정 프리셋 */}
                      
-                    {selectPreset !== "직접 추가" && userPreset[selectPreset] && (
+                    {selectedPresetId !== "직접 추가" && selectedPresetId !== 0 && selectedPresetId && (
                         <div>
-                            {Object.entries(userPreset[selectPreset]).map(([type, options]) => (
-                                <div key={type} className="presets">
-                                    <h4>{type}</h4>
-                                    <div className="presets-grid">
-                                        {options.map((option) => (
-                                            <button
-                                                key={option.id}
-                                                className={`presets-button ${selectOption[type] && selectOption[type].id === option.id ? "selected" : ""}`}
-                                                onClick={() => handleOptionClick(option, type)}
-                                            >
-                                                {option.name}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            ))}
+                            <h4>선택된 프리셋: {presets.find(p => p.presetPromptId == selectedPresetId)?.name}</h4>
+
+                            <div style={{ padding: '10px', backgroundColor: '#f5f5f5', marginTop: '10px' }}>
+                                <p><strong>말투:</strong> {options.tone.find(t => t.id == presets.find(p => p.presetPromptId == selectedPresetId)?.toneId)?.name || "설정되지 않음"}</p>
+                                <p><strong>성격:</strong> {options.personality.find(p => p.id == presets.find(pr => pr.presetPromptId == selectedPresetId)?.personalityId)?.name || "설정되지 않음"}</p>
+                                <p><strong>스타일:</strong> {options.style.find(s => s.id == presets.find(pr => pr.presetPromptId == selectedPresetId)?.styleId)?.name || "설정되지 않음"}</p>
+                                <p><strong>콘텐츠:</strong> {options.content.find(c => c.id == presets.find(pr => pr.presetPromptId == selectedPresetId)?.contentId)?.name || "설정되지 않음"}</p>
+                            </div>
                         </div>
                     )}
-                         
+
+                    
 
                     {/* 설정 직접 추가 */}
-                    {selectPreset === "직접 추가" && userPreset["직접 추가"] && (
+                    {selectedPresetId === "직접 추가" && (
                         <div>
-                            {Object.entries(userPreset["직접 추가"]).map(([type, options]) => (
+                            {Object.entries(options).map(([type, options]) => (
                                 <div key={type} className="presets">
                                     <h4>{type}</h4>
                                     <div className="presets-grid">
@@ -323,7 +279,7 @@ const Write = () => {
                             <div className="form-group">
                                 <label>ai피드백 (피드백 받기 체크, 프리셋 설정, 저장하기 누르면 나오게 만들기)</label>
                                 <textarea className="form-field"
-                                    id="aifeedback" placeholder="ai피드백 기다리는중" value={aifeedback}
+                                    id="aiFeedback" placeholder="ai피드백 기다리는중" value={aiFeedback}
                                     onChange={(e) => setAiFeedback(e.target.value)} ></textarea>
                             </div>
 
