@@ -1,12 +1,23 @@
+.nav-bar-container {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 50px;
+}
+
 .nav-bar {
   display: flex;
-  gap: 50px;
+  flex: 1;
+  gap: 150px;
   padding: 10px;
-  margin-bottom: 40px;
-  margin-top: 40px;
-  border: 2px solid var(--color-soft-brown);
+  margin: 40px 0;
+  border: 2px solid var(--color-gray);
   border-radius: 20px;
   justify-content: center;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .nav-button {
