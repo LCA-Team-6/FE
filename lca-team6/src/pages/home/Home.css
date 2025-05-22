@@ -6,7 +6,19 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-  }
+    padding: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.calendar-container {
+    width: 100%;
+    max-width: 1000px;
+    margin-bottom: 20px;
+}
+
+.memo-list-container {
+    width: 100%;
+    max-width: 1000px;
+}
   

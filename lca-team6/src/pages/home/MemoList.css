@@ -1,0 +1,47 @@
+.memo-list-container ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.memo-list-container p {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--color-dark-green);
+}
+
+.memo-item {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #eee;
+  border-radius: 6px;
+}
+
+.memo-content {
+  padding: 10px;
+  background-color: var(--color-light-gray);
+  border-radius: 4px;
+}
+
+.memo-content p {
+  color: #666;
+  margin: 0;
+  font-size: 0.9em;
+}
+
+.analysis-content {
+  padding: 10px;
+  background-color: var(--color-light-gray);
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.analysis-content p {
+  color: #666;
+  margin: 0;
+  font-size: 0.9em;
+}
+
+.analysis-content strong {
+  color: #444;
+}
