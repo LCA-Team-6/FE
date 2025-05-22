@@ -134,81 +134,100 @@ const Write = () => {
 
     // 저장하기 버튼 기능 ( 체크박스 체크 여부에 따른 기능 분리 )
     const handleSave = async () => {
-    if (!validateForm()) return;
-    
-    try {
-        // 일기 저장
-        const payload = { 
-            title, 
-            memo,
-            tone: selectOption.말투?.id,
-            personality: selectOption.성격?.id,
-            style: selectOption.스타일?.id,
-            content: selectOption.콘텐츠?.id
-        };
+        if (!validateForm()) return;
 
-        // 피드백이 체크되어 있으면 AI 분석 요청
-        if (showFeedback) {
-            try {
-                // 피드백 O: analysis 호출 (메모+분석 둘 다 처리)
-                const analysisPayload = {
-                    title, memo,
-                    tone: selectOption.말투?.id,
-                    personality: selectOption.성격?.id,
-                    style: selectOption.스타일?.id,
-                    content: selectOption.콘텐츠?.id
+        try {
+            // 일기 저장
+            const payload = {
+                title,
+                memo,
+                tone: selectOption.말투?.id,
+                personality: selectOption.성격?.id,
+                style: selectOption.스타일?.id,
+                content: selectOption.콘텐츠?.id
             };
-                const analysisRes = await customAxios.post('/analysis', analysisPayload);
-                
-                // AI 피드백 결과 저장
-                setSavedMemoId(analysisRes.data.memoId);
-                setAiFeedback(analysisRes.data.analysis || "분석 결과를 가져올 수 없습니다.");
-                setEmotions(analysisRes.data.emotions || []);
-                setHasFeedbackResponse(true);
-                
-            } catch (analysisError) {
-                console.error("AI 분석 에러:", analysisError);
-                
-                // AI 분석 실패해도 메모는 저장된 상태
-                alert("메모는 저장되었지만 AI 분석에 실패했습니다. 나중에 다시 시도해주세요.");
-                
-                setAiFeedback("AI 분석에 일시적인 문제가 발생했습니다.");
-                setEmotions([]);
-                setHasFeedbackResponse(true);
-            }
-        } else {
-            // 피드백 X: 메모만 저장
-            const payload = { title, memo };
-            const saveRes = await customAxios.post('/memos', payload);
-            setSavedMemoId(saveRes.data.memoId);
-            setHasFeedbackResponse(false);
-        }
 
-        alert("저장되었습니다!");
-        
-        // 폼 초기화 (제목, 메모만)
-        setTitle(""); 
-        setMemo("");
-        
-    } catch (err) {
-        console.error("저장 에러:", err);
-        
-        // 에러 응답 상세 정보
-        if (err.response) {
-            console.error("에러 응답:", err.response);
-            alert(`저장에 실패했습니다. (${err.response.status}: ${err.response.data?.message || "알 수 없는 오류"})`);
-        } else {
-            // 피드백 없이 메모만 저장
-            const payload = { title, memo };
-            const saveRes = await customAxios.post('/memos', payload);
-            setSavedMemoId(saveRes.data.memoId);
-            alert("저장에 실패했습니다. 네트워크를 확인해주세요.");
+            // 피드백이 체크되어 있으면 AI 분석 요청
+            if (showFeedback) {
+                try {
+                    // 피드백 O: analysis 호출 (메모+분석 둘 다 처리)
+                    const analysisPayload = {
+                        title, memo,
+                        tone: selectOption.말투?.id,
+                        personality: selectOption.성격?.id,
+                        style: selectOption.스타일?.id,
+                        content: selectOption.콘텐츠?.id
+                    };
+                    const analysisRes = await customAxios.post('/analysis', analysisPayload);
+
+                    const responseData = analysisRes.data.data;
+
+                    // 디버깅 로그
+                    console.log("=== 프론트엔드 응답 확인 ===");
+                    console.log("responseData:", responseData);
+                    console.log("analysis:", responseData.analysis);
+                    console.log("emotions:", responseData.emotions);
+                    console.log("memoId:", responseData.memoId);
+
+                    // AI 피드백 결과 저장
+                    setSavedMemoId(responseData.memoId);
+                    setAiFeedback(responseData.analysis || "분석 결과를 가져올 수 없습니다.");
+                    setEmotions(responseData.emotions || []);
+                    setHasFeedbackResponse(true);
+
+                    console.log("=== 상태 설정 완료 ===");
+                    console.log("aiFeedback:", responseData.analysis?.substring(0, 50));
+                    console.log("emotions length:", responseData.emotions?.length);
+
+                } catch (analysisError) {
+                    console.error("AI 분석 에러:", analysisError);
+
+                    // AI 분석 실패해도 메모는 저장된 상태
+                    alert("메모는 저장되었지만 AI 분석에 실패했습니다. 나중에 다시 시도해주세요.");
+
+                    setAiFeedback("AI 분석에 일시적인 문제가 발생했습니다.");
+                    setEmotions([]);
+                    setHasFeedbackResponse(true);
+                }
+            } else {
+                // 피드백 X: 메모만 저장
+                const payload = { title, memo };
+                const saveRes = await customAxios.post('/memos', payload);
+                setSavedMemoId(saveRes.data.memoId);
+                setHasFeedbackResponse(false);
+            }
+
+            alert("저장되었습니다!");
+
+            // 폼 초기화 (제목, 메모만)
+            setTitle("");
+            setMemo("");
+
+        } catch (err) {
+            console.error("저장 에러:", err);
+
+            // 에러 응답 상세 정보
+            if (err.response) {
+                console.error("에러 응답:", err.response);
+                alert(`저장에 실패했습니다. (${err.response.status}: ${err.response.data?.message || "알 수 없는 오류"})`);
+            } else {
+                // 피드백 없이 메모만 저장
+                const payload = { title, memo };
+                const saveRes = await customAxios.post('/memos', payload);
+                setSavedMemoId(saveRes.data.memoId);
+                alert("저장에 실패했습니다. 네트워크를 확인해주세요.");
+            }
         }
-    }
-};
+    };
 
     const handleAiFeedbackSave = async () => {
         try {
+            console.log("=== 피드백 저장 디버깅 ===");
+            console.log("savedMemoId:", savedMemoId);
+            console.log("selectedPresetId:", selectedPresetId);
+            console.log("aiFeedback length:", aiFeedback?.length);
+            console.log("emotions length:", emotions?.length);
+
             await customAxios.post('/analysis/save', {
                 memoId: savedMemoId,
                 presetPromptId: selectedPresetId === "직접 추가" ? null : selectedPresetId,
@@ -319,6 +338,7 @@ const Write = () => {
                     )}
 
                     {/* ai피드백 받는 필드 + 피드백 저장 버튼 */}
+
                     {showFeedback && hasFeedbackResponse && (
                         <div>
                             <div className="form-group">
@@ -332,7 +352,6 @@ const Write = () => {
                                     rows="8"
                                 />
                             </div>
-
                             {/* 감정 분석 결과도 보여주기 (선택사항) */}
                             {emotions.length > 0 && (
                                 <div className="emotions-display">
@@ -364,9 +383,10 @@ const Write = () => {
 
                 </div>
             )}
+
         </div>
-    );
-};
+    )
+}
 
 
 export default Write;
