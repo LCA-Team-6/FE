@@ -17,18 +17,23 @@
   padding: 10px;
   border: 2px solid var(--color-gray);
   border-radius: 10px;
+  background-color: white;
 }
 
 .memo-content {
   padding: 10px;
   background-color: var(--color-light-gray);
   border-radius: 4px;
+  max-height: 200px; /* 최대 높이 제한 */
+  overflow-y: auto; /* 내용이 넘치면 스크롤 */
 }
 
 .memo-content p {
   color: #666;
   margin: 0;
   font-size: 0.9em;
+  white-space: pre-wrap; /* 줄바꿈 유지 */
+  word-break: break-word; /* 긴 단어 줄바꿈 */
 }
 
 .analysis-content {
@@ -36,12 +41,16 @@
   background-color: var(--color-light-gray);
   border-radius: 4px;
   margin-top: 10px;
+  max-height: 200px; /* 최대 높이 제한 */
+  overflow-y: auto; /* 내용이 넘치면 스크롤 */
 }
 
 .analysis-content p {
   color: #666;
   margin: 0;
   font-size: 0.9em;
+  white-space: pre-wrap; /* 줄바꿈 유지 */
+  word-break: break-word; /* 긴 단어 줄바꿈 */
 }
 
 .analysis-content strong {
