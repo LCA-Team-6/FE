@@ -116,7 +116,7 @@ function Register() {
               setEmailChecked(false);
             }}
           />
-          <button className="register-button" type="button" onClick={handleEmailCheck}>
+          <button className="register-button-c" type="button" onClick={handleEmailCheck}>
             중복확인
           </button>
         </div>

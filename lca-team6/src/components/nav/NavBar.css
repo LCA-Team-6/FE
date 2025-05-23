@@ -12,12 +12,13 @@
   gap: 90px;
   padding: 10px;
   margin: 40px 0;
-  border: 2px solid var(--color-gray);
+  /* border: 2px solid var(--color-gray); */
   border-radius: 20px;
   justify-content: center;
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
+  
 }
 
 .nav-button {
@@ -25,10 +26,11 @@
   border-radius: 20px;
   color: var(--color-brown);
   font-weight: 700;
-  padding: 10px 15px;
-  font-size: 14px;
+  padding: 10px 25px;
+  font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s;
+  background-color: var(--bg-color);
 }
 
 .nav-button:hover {

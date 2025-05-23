@@ -5,14 +5,16 @@
 }
 
 .memo-list-container p {
+  margin-left: 13px;
   font-size: 1.2rem;
   font-weight: bold;
-  color: var(--color-dark-green);
+  /* color: var(--color-drak-green); */
 }
 
 .memo-item {
   margin-bottom: 20px;
-  padding: 15px;
+  margin: 10px;
+  padding: 10px;
   border: 2px solid var(--color-gray);
   border-radius: 10px;
 }
